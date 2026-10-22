@@ -1,0 +1,54 @@
+# --- build output & tooling -------------------------------------------------
+node_modules/
+dist/
+.astro/
+.netlify/
+.env
+.DS_Store
+
+# compiled matte binary + intermediate cake mattes
+tools/build/
+
+# --- raw shoot assets -------------------------------------------------------
+# The repo carries CODE and the DERIVED web assets (src/assets/img, public/video).
+# Camera masters and working files stay out — they run well over 1GB and nothing
+# in the build reads them at deploy time; only the scripts in tools/ do.
+#
+# Keep these on the drive next to the repo if you need to re-run
+# tools/encode-hero.sh, tools/encode-pour.sh or tools/prep-images.sh.
+#
+# NOTE: these are anchored with a leading slash on purpose. Unanchored, a rule
+# like `coffee.jpg` would also swallow src/assets/img/coffee.jpg, which IS meant
+# to be tracked.
+/HEROREEL*.mov
+/reel for mobile hero.mp4
+/GradedShots*.mov
+/Assorted Images/
+/cake grid images/
+/all cake images/
+/MENUS/
+/Extra Images/
+/cake delivery images/
+/new_logo.PNG
+/vanessa-visit-checklist.pdf
+/cafecito.jpg
+/coffee.jpg
+/coffee2.jpg
+/coffee*.psd
+/chocostrawberry_removebg.png
+/pandulcesign.jpg
+/pattingbread.jpg
+/sign.jpg
+# superseded 692px copy of the portrait kept below
+/IMG_1183_edited.jpg.avif
+
+# Exception, deliberately tracked: Vanessa's portrait at full resolution, pulled
+# off the Wix media server before that site is decommissioned. It is 0.7MB, it is
+# not reproducible once the old site goes away, and it is not yet used on any
+# page. Do not "tidy" this out of the repo.
+
+# Kept on this machine only, never in the (public) repo: project notes with
+# pricing and client notes, the open-questions list, and an unused photo.
+/CLAUDE.md
+/docs/questions-for-vanessa.md
+/vanessa-original.jpg

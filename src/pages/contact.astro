@@ -1,0 +1,272 @@
+---
+import Base from '../layouts/Base.astro';
+import FlourishRule from '../components/FlourishRule.astro';
+import { BIZ, HOURS } from '../site.ts';
+
+/* Her own line from the Wix contact page. Kept verbatim. */
+const heading = 'We are excited to hear from you!';
+---
+
+<Base
+  title="Contact — Love & Flour Bakery"
+  description="Get in touch with Love & Flour Bakery in Silver Spring, MD. Call (301) 433-2105, email shop@bakeryloveflour.com, or send us a message."
+>
+  <!-- ===================== header ===================== -->
+  <section class="section page-head">
+    <div class="shell">
+      <div class="page-head__inner">
+      <p class="eyebrow">Contact</p>
+      <h1 class="page-head__h">{heading}</h1>
+      <p class="lede">
+        Send us a message and we'll get back to you as soon as we can — or just call the shop,
+        we're there from 5&nbsp;a.m.
+      </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== cake signpost ===================== -->
+  <!-- Above the form on purpose: it has to be read before anyone starts typing,
+       or cake inquiries arrive here without the size, flavor or date. -->
+  <section class="cake-note">
+    <div class="shell cake-note__inner">
+      <p class="cake-note__text">
+        <strong>Ordering a cake?</strong> Use the cake order page instead — it asks for the
+        size, flavor and date we need to get started.
+      </p>
+      <a class="btn cake-note__btn" href="/order-cakes">Order a cake</a>
+    </div>
+  </section>
+
+  <!-- ===================== form + details ===================== -->
+  <section class="section contact">
+    <div class="shell contact__grid">
+      <!-- ---------- form ---------- -->
+      <div class="contact__form-col">
+        <h2 class="contact__h">Send a message</h2>
+
+        <form
+          id="contactForm"
+          name="contact"
+          method="POST"
+          action="/thank-you"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+        >
+          <!-- Required by Netlify: without it the POST isn't attributed to a form
+               and the submission is dropped without any error. -->
+          <input type="hidden" name="form-name" value="contact" />
+
+          <p class="honeypot" aria-hidden="true">
+            <label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+          </p>
+
+          <div class="field">
+            <label class="field__label" for="cf-name">Name</label>
+            <input id="cf-name" name="name" type="text" autocomplete="name" required />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="cf-email">Email</label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" required />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="cf-phone">
+              Phone <span class="field__note">(optional)</span>
+            </label>
+            <input id="cf-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="cf-message">Message</label>
+            <textarea id="cf-message" name="message" rows="6" required></textarea>
+          </div>
+
+          <button class="btn contact__submit" type="submit">Send message</button>
+
+          <!-- Politely announced when the request fails, so a dropped connection
+               doesn't look like a message that went through. -->
+          <p class="contact__error" id="contactError" role="alert" hidden>
+            Something went wrong sending that. Please try again, or call us on{' '}
+            <a href={BIZ.phoneHref}>{BIZ.phone}</a>.
+          </p>
+        </form>
+
+        <div class="contact__sent" id="contactSent" role="status" hidden>
+          <FlourishRule width={200} />
+          <h2 class="contact__sent-h">Thanks — we've got it.</h2>
+          <p>
+            We'll get back to you as soon as we can. If it's urgent, call us on{' '}
+            <a href={BIZ.phoneHref}>{BIZ.phone}</a>.
+          </p>
+        </div>
+      </div>
+
+      <!-- ---------- direct details ---------- -->
+      <!-- Beside the form, not below it: someone who would rather phone shouldn't
+           have to scroll past a form to find the number. -->
+      <aside class="contact__aside">
+        <h2 class="contact__h">Or reach us directly</h2>
+
+        <dl class="contact__list">
+          <div>
+            <dt>Phone</dt>
+            <dd><a href={BIZ.phoneHref}>{BIZ.phone}</a></dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd><a href={`mailto:${BIZ.email}`}>{BIZ.email}</a></dd>
+          </div>
+          <div>
+            <dt>Address</dt>
+            <dd>
+              <a href={BIZ.maps} target="_blank" rel="noopener">
+                {BIZ.street}<br />{BIZ.city}, {BIZ.state}&nbsp;{BIZ.zip}
+              </a>
+            </dd>
+          </div>
+        </dl>
+
+        <h3 class="contact__hours-h">Hours</h3>
+        <dl class="contact__hours">
+          {HOURS.map((h) => (
+            <div><dt>{h.days}</dt><dd>{h.time}</dd></div>
+          ))}
+        </dl>
+
+        <a class="link-quiet contact__directions" href={BIZ.directions} target="_blank" rel="noopener">
+          Get directions
+        </a>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- header ---------------- */
+  .page-head {
+    padding-block: clamp(2.25rem, 5vw, 3.25rem) clamp(1.25rem, 3vw, 2rem);
+  }
+  /* Constrained INSIDE .shell, not applied to it. Setting max-width on .shell
+     itself overrides the shell width, and its margin-inline:auto then centres
+     the narrow box — which left this header floating while the form below it
+     stayed at the shell's left edge. */
+  .page-head__inner { max-width: 58ch; }
+  .page-head .eyebrow { color: var(--ink-faint); margin-bottom: 0.45rem; }
+  .page-head__h {
+    font-size: var(--step-3);
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+  }
+
+  /* ---------------- cake signpost ---------------- */
+  .cake-note { background: var(--blush-wash); }
+  .cake-note__inner {
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: space-between;
+    gap: clamp(1rem, 3vw, 2rem);
+    padding-block: clamp(1.5rem, 3.5vw, 2rem);
+  }
+  .cake-note__text { margin: 0; max-width: 62ch; }
+  .cake-note__text strong { font-weight: 600; }
+  .cake-note__btn { flex: none; }
+
+  /* ---------------- layout ---------------- */
+  .contact__grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: clamp(2.5rem, 7vw, 5.5rem);
+    align-items: start;
+  }
+  @media (max-width: 860px) { .contact__grid { grid-template-columns: 1fr; } }
+
+  .contact__h {
+    font-size: var(--step-1);
+    margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  .contact__submit { margin-top: clamp(1.5rem, 3.5vw, 2rem); }
+
+  .contact__error {
+    margin-top: 1rem;
+    color: var(--brand-red-deep);
+    font-size: var(--step--1);
+  }
+
+  .contact__sent { padding-block: clamp(1rem, 3vw, 2rem); }
+  .contact__sent-h { font-size: var(--step-2); margin: 1.25rem 0 0.75rem; }
+
+  /* ---------------- details ---------------- */
+  .contact__aside {
+    background: var(--ground-deep);
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    border-radius: 2px;
+  }
+  .contact__list { margin: 0 0 2rem; }
+  .contact__list > div + div { margin-top: 1.1rem; }
+  .contact__list dt,
+  .contact__hours-h {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 0.2rem;
+  }
+  .contact__list dd { margin: 0; line-height: 1.6; }
+
+  .contact__hours-h { margin-bottom: 0.75rem; }
+  .contact__hours { margin: 0 0 1.75rem; font-size: var(--step--1); }
+  .contact__hours > div {
+    display: flex; justify-content: space-between; gap: 1rem;
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .contact__hours dt { color: var(--ink-soft); text-transform: none; letter-spacing: 0; font-family: var(--font-body); font-weight: 400; font-size: var(--step--1); }
+  .contact__hours dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+  .contact__aside a { text-decoration: none; }
+  .contact__aside a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .contact__directions { display: inline-block; color: var(--ink); }
+</style>
+
+<script is:inline>
+  (function () {
+    var form = document.getElementById('contactForm');
+    var sent = document.getElementById('contactSent');
+    var error = document.getElementById('contactError');
+    if (!form || !sent || !error) return;
+
+    form.addEventListener('submit', function (e) {
+      // Let the browser's own validation run first; if it fails, do nothing and
+      // let the native messages show.
+      if (!form.checkValidity()) return;
+
+      e.preventDefault();
+      error.hidden = true;
+
+      var btn = form.querySelector('button[type=submit]');
+      var label = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+      // Netlify accepts the encoded form body on any path of the deployed site.
+      fetch(location.pathname, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(new FormData(form)).toString(),
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          form.hidden = true;
+          sent.hidden = false;
+          sent.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        })
+        .catch(function () {
+          error.hidden = false;
+          if (btn) { btn.disabled = false; btn.textContent = label; }
+        });
+    });
+  })();
+</script>

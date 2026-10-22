@@ -1,0 +1,112 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/img/logo.png';
+import { BIZ, HOURS, CLOVER, NAV } from '../site.ts';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell footer__grid">
+    <div class="footer__brand">
+      <Image src={logo} alt="Love & Flour Bakery" width={150} height={150} loading="lazy" />
+      <p class="footer__tag">{BIZ.tagline}</p>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Visit</h2>
+      <address>
+        <a href={BIZ.maps} target="_blank" rel="noopener">
+          {BIZ.street}<br />{BIZ.city}, {BIZ.state} {BIZ.zip}
+        </a>
+        <br /><br />
+        <a href={BIZ.phoneHref}>{BIZ.phone}</a>
+      </address>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Hours</h2>
+      <ul class="footer__hours">
+        {HOURS.map((h) => (
+          <li><span>{h.short}</span> {h.time}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="footer__h">Explore</h2>
+      <ul class="footer__nav">
+        {NAV.map((item) => (
+          <li>
+            <a href={item.href} {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="shell footer__base">
+    <p>&copy; {BIZ.established}&ndash;{year} {BIZ.name}. Est. {BIZ.established}.</p>
+    <a class="link-quiet" href={CLOVER} target="_blank" rel="noopener">Order online</a>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ground-deep);
+    border-top: 1px solid var(--hairline);
+    padding-block: clamp(3rem, 7vw, 5rem) 2rem;
+    font-size: var(--step--1);
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    grid-template-columns: 1.3fr 1fr 1.2fr 0.9fr;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 520px) { .footer__grid { grid-template-columns: 1fr; } }
+
+  .footer__brand :global(img) { width: 96px; height: auto; }
+  .footer__tag {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 1rem 0 0;
+  }
+
+  .footer__h {
+    font-size: var(--step--1);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 1rem;
+    font-weight: 600;
+  }
+
+  address { font-style: normal; line-height: 1.75; }
+  .footer a { text-decoration: none; }
+  .footer a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .footer__hours {
+    list-style: none; margin: 0; padding: 0;
+    line-height: 1.95; font-variant-numeric: tabular-nums;
+  }
+  .footer__hours span { color: var(--ink-soft); }
+
+  .footer__nav { list-style: none; margin: 0; padding: 0; line-height: 2; }
+
+  .footer__base {
+    display: flex; flex-wrap: wrap; gap: 1rem;
+    align-items: center; justify-content: space-between;
+    margin-top: clamp(2.5rem, 6vw, 4rem);
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--hairline);
+    color: var(--ink-soft);
+  }
+  .footer__base p { margin: 0; }
+</style>

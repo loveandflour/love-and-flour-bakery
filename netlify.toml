@@ -1,0 +1,25 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[[headers]]
+  for = "/video/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Old Wix addresses -> the new pages, so saved links and old Google results
+# land in the right place. 301 = moved for good, which also tells Google to
+# pass the old page's standing to the new one. /contact and / kept the same
+# paths, so they need nothing. Never rename a new page to match an old one.
+[[redirects]]
+  from = "/general-5"
+  to = "/menu"
+  status = 301
+
+[[redirects]]
+  from = "/about-me"
+  to = "/about"
+  status = 301

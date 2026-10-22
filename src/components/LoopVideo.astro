@@ -1,0 +1,81 @@
+---
+/**
+ * A muted, looping background video that behaves itself:
+ *
+ *  - sources are attached by script, never in the markup, so
+ *    `prefers-reduced-motion: reduce` gets the poster still and downloads nothing
+ *  - phones get the smaller encode
+ *  - it only loads and plays once it is actually on screen, and pauses when it
+ *    scrolls away — this one lives well below the fold, so autoplaying on load
+ *    would decode video nobody is looking at
+ *
+ * The hero has its own copy of this logic because it must start immediately
+ * rather than waiting to be scrolled into view.
+ */
+interface Props {
+  base: string;          // e.g. "/video/pour-900" (no extension)
+  baseMobile?: string;
+  poster: string;
+  label: string;
+  class?: string;
+}
+const { base, baseMobile, poster, label, class: className = '' } = Astro.props;
+const uid = 'lv-' + Math.random().toString(36).slice(2, 9);
+---
+
+<video
+  id={uid}
+  class={`loop-video ${className}`}
+  poster={poster}
+  role="img"
+  aria-label={label}
+  muted
+  loop
+  playsinline
+  preload="none"
+  data-base={base}
+  data-base-mobile={baseMobile ?? base}
+></video>
+
+<style>
+  .loop-video { display: block; width: 100%; height: auto; }
+</style>
+
+<script is:inline define:vars={{ uid }}>
+  (function () {
+    var v = document.getElementById(uid);
+    if (!v) return;
+
+    // Reduced motion: the poster stands in, and no video is ever requested.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var loaded = false;
+    function load() {
+      if (loaded) return;
+      loaded = true;
+      var small = window.matchMedia('(max-width: 900px)').matches;
+      var base = small ? v.dataset.baseMobile : v.dataset.base;
+      [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (f) {
+        var s = document.createElement('source');
+        s.src = base + '.' + f[0];
+        s.type = f[1];
+        v.appendChild(s);
+      });
+      v.load();
+    }
+
+    if (!('IntersectionObserver' in window)) { load(); v.play().catch(function () {}); return; }
+
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          load();
+          var p = v.play();
+          if (p && p.catch) p.catch(function () { /* autoplay refused — poster stands */ });
+        } else if (loaded) {
+          v.pause();
+        }
+      });
+    }, { threshold: 0.25 }).observe(v);
+  })();
+</script>

@@ -1,0 +1,376 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import FlourishRule from '../components/FlourishRule.astro';
+import LoopVideo from '../components/LoopVideo.astro';
+import { BIZ, HOURS, CLOVER } from '../site.ts';
+
+import cafecito from '../assets/img/cafecito.jpg';
+import panDeBono from '../assets/img/pan-de-bono.jpg';
+
+import { HOME_CAKES, flavorById } from '../data/cakes.ts';
+
+/* Four flavors from the order page's own list, so the names, photos and
+   links can't drift apart. Each one opens the order form with it picked. */
+const cakes = HOME_CAKES.map((id) => flavorById(id)!);
+
+const lanes = [
+  {
+    title: 'Pastries & bread',
+    body: 'Conchas, pan de bono, empanadas and fresh bread, baked in small batches through the day.',
+    href: '/menu',
+    cta: 'See the menu',
+  },
+  {
+    title: 'Breakfast & lunch',
+    body: 'Huevos rancheros, omelettes, fajitas and homemade sandwiches — served all day, every day.',
+    href: '/menu',
+    cta: 'See the menu',
+  },
+  {
+    title: 'Cakes & celebrations',
+    body: 'Pick one of ours or design your own. Every cake is confirmed with us directly, never checked out online.',
+    href: '/order-cakes',
+    cta: 'Order a cake',
+  },
+];
+---
+
+<Base
+  hasHero
+  title="Love & Flour Bakery — Silver Spring, MD"
+  description="A Colombian and Venezuelan bakery and café in Silver Spring. Pan dulce, cakes, and breakfast. Made from scratch starting at 5 am. Open daily on Piney Branch Rd."
+>
+  <Hero />
+
+  <!-- ===================== our story ===================== -->
+  <section class="section story" id="story">
+    <div class="shell story__grid">
+      <figure class="story__figure">
+        <Image
+          src={cafecito}
+          alt="The bakery's Cafecito neon sign hanging against a pink wall"
+          widths={[560, 840, 1200]}
+          sizes="(max-width: 900px) 92vw, 46vw"
+          loading="lazy"
+        />
+      </figure>
+
+      <div class="story__body">
+        <p class="eyebrow">Nuestra Historia</p>
+        <h2 class="story__h">Our Story</h2>
+        <p>
+          We bake a wide variety of pastries fresh daily — savory and sweet pastries to
+          go with your coffee, plus custom cakes, desserts, crepes, pancakes and more.
+        </p>
+        <p>
+          Our team of experienced bakers and pastry chefs takes pride in using only the
+          finest ingredients and preparing everything from scratch.
+        </p>
+        <p class="story__close">
+          Come visit us and taste the love that we put into every pastry we make.
+        </p>
+        <a class="link-quiet story__more" href="/about">Read our story</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== what we bake ===================== -->
+  <section class="section bake" id="bake">
+    <div class="bake__strip">
+      <Image
+        src={panDeBono}
+        alt="Rows of sesame-topped pan de bono cooling in foil tins"
+        widths={[760, 1200, 1800, 2400]}
+        sizes="100vw"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="shell">
+      <FlourishRule class="bake__rule" />
+      <h2 class="bake__h">What we bake</h2>
+
+      <div class="lanes">
+        {lanes.map((lane) => (
+          <div class="lane">
+            <h3 class="lane__h">{lane.title}</h3>
+            <p class="lane__body">{lane.body}</p>
+            <a class="link-quiet lane__cta" href={lane.href}>{lane.cta}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== cakes ===================== -->
+  <section class="section cakes" id="cakes">
+    <div class="shell">
+      <div class="cakes__head">
+        <div>
+          <p class="eyebrow">Made to order</p>
+          <h2 class="cakes__h">A cake for the occasion</h2>
+        </div>
+        <p class="cakes__note">
+          Cakes are never checked out online — we confirm every one with you directly,
+          so the date, size and design are right before you pay.
+        </p>
+      </div>
+
+      <ul class="cake-grid">
+        {cakes.map((cake) => (
+          <li class="cake">
+            <a class="cake__link" href={`/order-cakes?flavor=${cake.id}`}>
+              <span class="cake__plate">
+                <Image
+                  src={cake.img!}
+                  alt={`${cake.name} cake`}
+                  widths={[320, 520, 800]}
+                  sizes="(max-width: 620px) 44vw, (max-width: 1000px) 30vw, 260px"
+                  loading="lazy"
+                />
+              </span>
+              <span class="cake__name">{cake.name}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="cakes__cta">
+        <a class="btn" href="/order-cakes">Start a cake order</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== visit ===================== -->
+  <section class="section visit" id="visit">
+    <div class="shell visit__grid">
+      <div class="visit__body">
+        <p class="eyebrow">Silver Spring, MD</p>
+        <h2 class="visit__h">The ovens are on at&nbsp;5&nbsp;a.m.</h2>
+        <p class="lede">
+          Come in for coffee and something still warm, or order ahead and pick it up
+          on your way through.
+        </p>
+
+        <dl class="visit__hours">
+          {HOURS.map((h) => (
+            <div><dt>{h.days}</dt><dd>{h.time}</dd></div>
+          ))}
+        </dl>
+
+        <div class="visit__contact">
+          <a href={BIZ.maps} target="_blank" rel="noopener">
+            {BIZ.street}, {BIZ.city}, {BIZ.state} {BIZ.zip}
+          </a>
+          <a href={BIZ.phoneHref}>{BIZ.phone}</a>
+        </div>
+
+        <div class="visit__actions">
+          <a class="btn" href={CLOVER} target="_blank" rel="noopener">Order online</a>
+          <a class="link-quiet" href={BIZ.directions} target="_blank" rel="noopener">Get directions</a>
+        </div>
+      </div>
+
+      <figure class="visit__figure">
+        <LoopVideo
+          base="/video/pour-900"
+          baseMobile="/video/pour-620"
+          poster="/video/pour-poster.jpg"
+          label="A Love &amp; Flour barista pouring steamed milk into a glass of coffee"
+        />
+      </figure>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- story ---------------- */
+  .story__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .story__figure { margin: 0; }
+  /* The Cafecito neon is a 9:16 portrait; 4:5 keeps it tall without dominating
+     the row. */
+  .story__figure :global(img) {
+    width: 100%;
+    /* height:auto is required — Astro emits width/height attributes, and the
+       height presentational hint beats aspect-ratio unless height is auto. */
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    /* Sits the sign in the middle of the crop and trims the shelving below it. */
+    object-position: center 38%;
+    border-radius: 2px;
+  }
+  @media (max-width: 900px) {
+    /* Square, not landscape. The source is a 9:16 portrait, so a 3:2 box threw
+       away ~62% of its height and cropped the sign tight against the frame.
+       1:1 keeps the whole sign with room around it, and the crop sits a little
+       higher than the desktop 4:5 to keep the shelving out of the bottom. */
+    .story__figure :global(img) {
+      aspect-ratio: 1 / 1;
+      object-position: center 30%;
+    }
+  }
+  .story__h { font-size: var(--step-3); margin-bottom: 1.5rem; }
+  .story__close { color: var(--ink-soft); font-style: italic; }
+  .story__more { display: inline-block; margin-top: 1.75rem; color: var(--ink); }
+  @media (max-width: 900px) {
+    .story__grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------------- what we bake ---------------- */
+  .bake { background: var(--ground-deep); padding-top: 0; }
+  .bake__strip { margin-bottom: var(--section-y); }
+  .bake__strip :global(img) {
+    width: 100%;
+    height: clamp(240px, 34vw, 440px);
+    object-fit: cover;
+    object-position: center 58%;
+  }
+
+  .bake__rule { margin-bottom: 1.75rem; }
+  .bake__h {
+    font-size: var(--step-3);
+    text-align: center;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .lanes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+  }
+  @media (max-width: 820px) { .lanes { grid-template-columns: 1fr; } }
+
+  .lane { border-top: 2px solid var(--blush); padding-top: 1.5rem; }
+  .lane__h {
+    font-size: var(--step-1);
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.01em;
+  }
+  .lane__body { color: var(--ink-soft); margin-bottom: 1.4rem; }
+  .lane__cta { color: var(--ink); }
+
+  /* ---------------- cakes ---------------- */
+  .cakes { background: var(--blush-wash); }
+
+  .cakes__head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: end;
+    margin-bottom: clamp(2.5rem, 6vw, 4rem);
+  }
+  .cakes__h { font-size: var(--step-3); }
+  /* The one plain operational sentence, stated up front. */
+  .cakes__note { color: var(--ink-soft); margin: 0; }
+  @media (max-width: 780px) { .cakes__head { grid-template-columns: 1fr; } }
+
+  .cake-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+  }
+  @media (max-width: 1000px) { .cake-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .cake__link {
+    display: block; text-decoration: none;
+    text-align: center;
+  }
+  /* The cakes sit inside their cell rather than filling it — they read as
+     objects on a ground, and the gaps stay legible. */
+  .cake__plate {
+    display: block;
+    max-width: 84%;
+    margin-inline: auto;
+    padding-bottom: 0.6rem;
+  }
+  @media (max-width: 1000px) { .cake__plate { max-width: 88%; } }
+
+  .cake__plate :global(img) {
+    width: 100%; height: auto;
+    /* Matting stripped the cakes' original contact shadows. This puts one back
+       from the alpha channel, so it follows each cake's actual base instead of
+       being a drawn ellipse sitting underneath it — a shape you notice, and the
+       reason the first attempt read as fake. */
+    filter: drop-shadow(0 13px 13px rgba(59, 36, 27, 0.22));
+    transition: transform 0.35s ease, filter 0.35s ease;
+  }
+  .cake__link:hover .cake__plate :global(img) {
+    transform: translateY(-6px) scale(1.02);
+    filter: drop-shadow(0 20px 18px rgba(59, 36, 27, 0.24));
+  }
+
+  .cake__name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 0.5rem;
+  }
+
+  .cakes__cta { margin-top: clamp(2.5rem, 6vw, 4rem); text-align: center; }
+
+  /* ---------------- visit ---------------- */
+  .visit__grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: center;
+  }
+  .visit__h { font-size: var(--step-3); margin-bottom: 1.25rem; }
+  .visit__figure { margin: 0; }
+  /* The 4:5 crop and its vertical offset are baked into the encode
+     (tools/encode-pour.sh), so nothing is downloaded just to be cropped away.
+     Mobile squares it off, which crops a little further from the same file. */
+  .visit__figure :global(video) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 2px;
+    background: var(--ground-deep);
+  }
+  @media (max-width: 900px) {
+    .visit__figure :global(video) { aspect-ratio: 1 / 1; }
+  }
+
+  .visit__hours {
+    margin: clamp(2rem, 4vw, 2.75rem) 0;
+    border-top: 1px solid var(--hairline);
+  }
+  .visit__hours div {
+    display: flex; justify-content: space-between; gap: 1.5rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .visit__hours dt { color: var(--ink-soft); }
+  .visit__hours dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+  .visit__contact {
+    display: flex; flex-direction: column; gap: 0.35rem;
+    margin-bottom: 2rem;
+  }
+  .visit__contact a { text-decoration: none; }
+  .visit__contact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .visit__actions {
+    display: flex; align-items: center; flex-wrap: wrap;
+    gap: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  @media (max-width: 900px) {
+    .visit__grid { grid-template-columns: 1fr; }
+    .visit__figure { order: -1; }
+  }
+</style>

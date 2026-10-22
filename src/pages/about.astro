@@ -1,0 +1,183 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import FlourishRule from '../components/FlourishRule.astro';
+import { BIZ, CLOVER } from '../site.ts';
+
+import sign from '../assets/img/sign.jpg';
+
+/*
+ * The copy below is the client's own, lifted verbatim from loveandflourmd.com.
+ * The Spanish is hers too — not a translation of the English — which is why it
+ * sits on the page as an equal block rather than behind a language toggle.
+ * Do not rewrite either one without asking her.
+ */
+const storyEn = [
+  `Love & Flour is Silver Spring's newest bakery. We bake a wide variety of pastries fresh daily. From delicious savory and sweet pastries to go with your coffee, to custom cakes, desserts, crepes, pancakes and more.`,
+  `We are so excited to be a part of the local community and to hopefully see you all soon. Our team of experienced bakers and pastry chefs work tirelessly to create the perfect treats for you to enjoy.`,
+  `We take pride in using only the finest ingredients and preparing everything from scratch.`,
+];
+const closingEn = `Come visit us and taste the love that we put into every pastry we make.`;
+
+const storyEs = [
+  `Love & Flour es la panadería más nueva de Silver Spring. Horneamos una amplia variedad de pasteles frescos todos los días. Desde deliciosos pasteles salados y dulces para acompañar su café, hasta pasteles personalizados, postres, crepes, panqueques y más.`,
+  `Estamos muy emocionados de ser parte de la comunidad local y esperamos verlos a todos pronto. Nuestro equipo de panaderos y pasteleros experimentados trabaja incansablemente para crear las delicias perfectas para que las disfrutes.`,
+  `Nos enorgullecemos de usar solo los mejores ingredientes y de preparar todo desde cero.`,
+];
+const closingEs = `Ven a visitarnos y prueba el amor que ponemos en cada pastel que hacemos.`;
+---
+
+<Base
+  title="Our Story — Love & Flour Bakery"
+  description="Love & Flour is Silver Spring's newest bakery, baking a wide variety of pastries fresh daily — savory and sweet pastries, custom cakes, desserts, crepes and more."
+  ogImage="/og-sign.jpg"
+>
+  <!-- ===================== header over the sign ===================== -->
+  <!-- The title sits on the open sky to the right of the sign. Measured across
+       that half of the frame, --ink reads at 9.7-13.7:1, so it needs no scrim —
+       which matters, because dimming this shot would flatten the one genuinely
+       colourful thing in it. -->
+  <section class="banner">
+    <Image
+      class="banner__img"
+      src={sign}
+      alt="The Love & Flour Bakery sign hanging outside the shop on Piney Branch Road"
+      widths={[760, 1200, 1800, 2400]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="banner__overlay">
+      <div class="shell banner__shell">
+        <div class="banner__text">
+          <p class="eyebrow">Nuestra Historia</p>
+          <h1 class="banner__h">Our Story</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== english ===================== -->
+  <section class="section story">
+    <div class="shell story__inner">
+      {storyEn.map((p) => <p>{p}</p>)}
+      <p class="story__close">{closingEn}</p>
+    </div>
+  </section>
+
+  <!-- ===================== spanish ===================== -->
+  <!-- lang="es" so screen readers switch pronunciation and search engines
+       index it as Spanish rather than mangled English. -->
+  <section class="section story story--es" lang="es">
+    <div class="shell story__inner">
+      <FlourishRule class="story__rule" />
+      <p class="eyebrow story__eyebrow">En español</p>
+      {storyEs.map((p) => <p>{p}</p>)}
+      <p class="story__close">{closingEs}</p>
+    </div>
+  </section>
+
+  <!-- ===================== visit ===================== -->
+  <!-- The sign lives here rather than at the top of the page: it is what you
+       look for when you arrive, so it belongs next to the address. -->
+  <section class="section visit-cta">
+    <div class="shell">
+      <div class="visit-cta__inner">
+      <h2 class="visit-cta__h">Come see us on Piney&nbsp;Branch</h2>
+      <!-- Address and phone on their own lines, matching the landing page's Visit
+           block. An inline separator between them orphans onto a line of its own
+           the moment the address wraps, which it does at almost every width. -->
+      <p class="lede visit-cta__address">
+        <span>{BIZ.street}, {BIZ.city}, {BIZ.state}&nbsp;{BIZ.zip}</span>
+        <a href={BIZ.phoneHref}>{BIZ.phone}</a>
+      </p>
+      <div class="visit-cta__actions">
+        <a class="btn" href={CLOVER} target="_blank" rel="noopener">Order online</a>
+        <a class="link-quiet" href={BIZ.directions} target="_blank" rel="noopener">Get directions</a>
+      </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- header ---------------- */
+  /* A band, not a hero — short on purpose, so the story starts almost
+     immediately instead of a screen down. */
+  .banner { position: relative; }
+  .banner__img {
+    display: block;
+    width: 100%;
+    height: clamp(300px, 26vw, 380px);
+    object-fit: cover;
+    /* Biased left so the sign stays in frame and the sky opens up on the right,
+       which is where the title goes. */
+    object-position: 20% 50%;
+  }
+  .banner__overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center;
+  }
+  .banner__shell { width: 100%; }
+  .banner__text { margin-left: 52%; }   /* the right half — clear of the sign */
+  .banner__text .eyebrow { color: var(--ink-soft); margin-bottom: 0.4rem; }
+  .banner__h {
+    font-size: var(--step-3);
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+
+  /* Narrow screens: the sign fills the frame and there is no sky left to write
+     on, so the title drops below the image rather than fighting it. */
+  @media (max-width: 860px) {
+    .banner__img { height: clamp(200px, 46vw, 260px); object-position: 26% 50%; }
+    .banner__overlay { position: static; display: block; }
+    .banner__text {
+      margin-left: 0;
+      text-align: center;
+      padding-top: clamp(1.5rem, 5vw, 2rem);
+    }
+  }
+
+  /* ---------------- the sign ---------------- */
+  .sign { margin: 0; }
+  .sign :global(img) {
+    width: 100%;
+    height: clamp(260px, 40vw, 520px);
+    object-fit: cover;
+    /* The sign sits left of centre with open sky to its right; biasing the crop
+       left keeps it in frame as the viewport narrows. */
+    object-position: 32% 50%;
+  }
+
+  /* ---------------- story ---------------- */
+  .story__inner { max-width: 68ch; }
+  .story :global(p) { font-size: var(--step-1); line-height: 1.62; }
+  .story :global(p + p) { margin-top: 0.4em; }
+  .story__close {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .story--es { background: var(--blush-wash); }
+  .story__rule { margin: 0 auto clamp(1.5rem, 4vw, 2.5rem); }
+  .story__eyebrow { text-align: center; color: var(--ink-soft); }
+
+  /* ---------------- visit ---------------- */
+  /* Centred: the sign now lives in the banner at the top of the page, so this
+     block is text only rather than a two-column split. */
+  .visit-cta { background: var(--ground-deep); text-align: center; }
+  .visit-cta__inner { max-width: 68ch; margin-inline: auto; }
+  .visit-cta__h { font-size: var(--step-2); margin-bottom: 1rem; }
+  .visit-cta__address {
+    display: flex; flex-direction: column; gap: 0.2rem;
+    align-items: center;
+  }
+  .visit-cta__address a { text-decoration: none; }
+  .visit-cta__address a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .visit-cta__actions {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  }
+</style>

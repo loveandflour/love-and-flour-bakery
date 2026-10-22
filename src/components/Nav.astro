@@ -1,0 +1,204 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/img/logo.png';
+import { NAV, CLOVER } from '../site.ts';
+
+interface Props {
+  /** True only on the page that opens with the full-bleed hero. */
+  hasHero?: boolean;
+}
+const { hasHero = false } = Astro.props;
+
+// Rendered by the server, not left to the client script: on a page with no hero
+// the transparent/white state would paint white text on a cream ground until the
+// script caught up.
+const initialState = hasHero ? 'over-hero' : 'scrolled';
+
+/** Trailing slashes vary between dev and the built output, so compare normalised. */
+const here = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/+$/, '') === here;
+---
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="siteNav" data-state={initialState}>
+  <div class="nav__inner">
+    <a class="nav__brand" href="/" aria-label="Love &amp; Flour Bakery — home">
+      <Image src={logo} alt="" width={112} height={112} loading="eager" />
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      {NAV.map((item) => (
+        <a
+          href={item.href}
+          class="nav__link"
+          aria-current={isCurrent(item.href) ? 'page' : undefined}
+          {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >{item.label}</a>
+      ))}
+    </nav>
+
+    <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navPanel">
+      <span class="visually-hidden">Menu</span>
+      <span class="nav__bars" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </div>
+
+  <div class="nav__panel" id="navPanel" hidden>
+    {NAV.map((item) => (
+      <a
+        href={item.href}
+        aria-current={isCurrent(item.href) ? 'page' : undefined}
+        {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+      >{item.label}</a>
+    ))}
+    <a class="nav__panel-cta" href={CLOVER} target="_blank" rel="noopener">Order online</a>
+  </div>
+</header>
+
+<style>
+  .skip {
+    position: absolute; left: 50%; top: 0; transform: translate(-50%, -140%);
+    z-index: 200; background: var(--brand-red); color: #fff;
+    padding: 0.8em 1.4em; font-family: var(--font-display); font-size: 0.85rem;
+    letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+  .skip:focus { transform: translate(-50%, 0); }
+
+  .nav {
+    position: fixed; inset-inline: 0; top: 0; z-index: 100;
+    transition: background 0.35s ease, box-shadow 0.35s ease;
+  }
+  /* Overlaid directly on the hero — no bar — while the dark footage carries it. */
+  .nav[data-state='over-hero'] { background: transparent; color: #fff; }
+  .nav[data-state='scrolled'] {
+    background: color-mix(in srgb, var(--ground) 94%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 var(--hairline);
+    color: var(--ink);
+  }
+
+  .nav__inner {
+    max-width: var(--shell); margin-inline: auto;
+    padding: clamp(0.7rem, 1.6vw, 1.1rem) var(--gutter);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .nav__brand { display: block; line-height: 0; }
+  .nav__brand :global(img) {
+    width: clamp(46px, 5.4vw, 62px); height: auto;
+    transition: filter 0.35s ease;
+  }
+  /* The badge is a pink circle; over dark footage it needs a touch of lift. */
+  .nav[data-state='over-hero'] .nav__brand :global(img) {
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.45));
+  }
+
+  .nav__links { display: flex; gap: clamp(1.1rem, 2.4vw, 2.3rem); align-items: center; }
+  .nav__link {
+    font-family: var(--font-display);
+    font-size: var(--step--1); font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+    padding-block: 0.4em; position: relative; white-space: nowrap;
+  }
+  .nav__link::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+    height: 1px; background: currentColor;
+    transform: scaleX(0); transform-origin: left; transition: transform 0.25s ease;
+  }
+  .nav__link:hover::after { transform: scaleX(1); }
+  /* The page you are on keeps its underline. */
+  .nav__link[aria-current='page']::after { transform: scaleX(1); }
+  .nav__panel a[aria-current='page'] { color: var(--brand-red); }
+  .nav[data-state='over-hero'] .nav__link { text-shadow: 0 1px 12px rgba(0,0,0,.5); }
+
+  .nav__toggle {
+    display: none; background: none; border: 0; color: inherit;
+    padding: 0.6rem; cursor: pointer;
+  }
+  .nav__bars { display: block; width: 26px; }
+  .nav__bars i {
+    display: block; height: 1.5px; background: currentColor; border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .nav__bars i + i { margin-top: 7px; }
+  .nav[data-open] .nav__bars i:first-child { transform: translateY(4.25px) rotate(45deg); }
+  .nav[data-open] .nav__bars i:last-child  { transform: translateY(-4.25px) rotate(-45deg); }
+
+  .nav__panel { display: none; }
+
+  @media (max-width: 860px) {
+    .nav__links { display: none; }
+    .nav__toggle { display: block; }
+
+    .nav__panel {
+      display: flex; flex-direction: column; gap: 0.35rem;
+      padding: 0.5rem var(--gutter) 2rem;
+      background: var(--ground); color: var(--ink);
+      border-top: 1px solid var(--hairline);
+    }
+    .nav__panel[hidden] { display: none; }
+    .nav__panel a {
+      font-family: var(--font-display); font-size: var(--step-1);
+      font-weight: 500; letter-spacing: 0.04em; text-decoration: none;
+      padding: 0.7rem 0; border-bottom: 1px solid var(--hairline);
+    }
+    .nav__panel-cta {
+      margin-top: 1.1rem; border-bottom: 0 !important;
+      background: var(--brand-red); color: #fff; text-align: center;
+      padding: 1em 1.5em !important; border-radius: 2px;
+      font-size: var(--step--1) !important; letter-spacing: 0.1em !important;
+      text-transform: uppercase;
+    }
+    /* Once the panel is open the nav always needs its solid ground. */
+    .nav[data-open] { background: var(--ground); color: var(--ink); }
+    .nav[data-open] .nav__brand :global(img) { filter: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var nav = document.getElementById('siteNav');
+    var toggle = document.getElementById('navToggle');
+    var panel = document.getElementById('navPanel');
+    if (!nav || !toggle || !panel) return;
+
+    toggle.addEventListener('click', function () {
+      var open = nav.hasAttribute('data-open');
+      if (open) { nav.removeAttribute('data-open'); panel.hidden = true; }
+      else { nav.setAttribute('data-open', ''); panel.hidden = false; }
+      toggle.setAttribute('aria-expanded', String(!open));
+    });
+
+    // Swap to the solid ground once the hero has scrolled past.
+    // This runs while the document is still parsing — the hero lives further down
+    // the page and does not exist yet — so wait for the DOM before looking for it.
+    function watchHero() {
+      // The video hero, or a page's own dark header marked data-nav-over (the
+      // Menu page). Pages with neither just keep the solid nav.
+      var hero = document.getElementById('hero') || document.querySelector('[data-nav-over]');
+      if (!hero || !('IntersectionObserver' in window)) {
+        nav.dataset.state = 'scrolled';
+        return;
+      }
+      // Flip to solid the moment the dark area's bottom edge passes under the
+      // nav's own bottom edge, so white nav text never sits over the light page.
+      // The nav is a different height at each breakpoint, so measure it.
+      var navH = Math.round(nav.getBoundingClientRect().height);
+      new IntersectionObserver(
+        function (entries) {
+          nav.dataset.state = entries[0].isIntersecting ? 'over-hero' : 'scrolled';
+        },
+        { rootMargin: '-' + navH + 'px 0px 0px 0px', threshold: 0 }
+      ).observe(hero);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', watchHero);
+    } else {
+      watchHero();
+    }
+  })();
+</script>

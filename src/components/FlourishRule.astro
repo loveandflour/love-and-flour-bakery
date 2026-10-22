@@ -1,0 +1,55 @@
+---
+/**
+ * The signature element.
+ *
+ * Redrawn from the flourish inside the client's own logo badge: a small heart
+ * with a thin script swirl trailing off each side, each ending in a curl. It is
+ * lifted directly from her mark, which is what keeps it from reading as a
+ * generic bakery divider.
+ *
+ * The heart is the only place --brand-red appears outside the Order button, and
+ * it appears there because it is literally part of the logo.
+ */
+interface Props {
+  width?: number;
+  tone?: 'ink' | 'light';
+  class?: string;
+}
+const { width = 260, tone = 'ink', class: className = '' } = Astro.props;
+
+const line = tone === 'light' ? 'rgba(255,255,255,.55)' : 'var(--ink-faint)';
+const heart = tone === 'light' ? 'var(--blush)' : 'var(--brand-red)';
+---
+
+<svg
+  class={`flourish ${className}`}
+  width={width}
+  viewBox="0 0 260 34"
+  fill="none"
+  aria-hidden="true"
+  focusable="false"
+  style={`--flourish-line:${line}; --flourish-heart:${heart};`}
+>
+  <g stroke="var(--flourish-line)" stroke-width="1.1" stroke-linecap="round">
+    <!-- right half: a long tapering swirl that ends in a small curl -->
+    <g id="lf-half">
+      <path d="M142 24 C 163 16, 190 15, 209 20" />
+      <path d="M209 20 C 216 22, 222 20, 222.5 16 C 223 12, 218 10, 215.5 13
+               C 213 16, 216 21, 223 22 C 231 23, 238 21, 244 18" />
+    </g>
+    <!-- left half is the same path mirrored, so both sides match exactly -->
+    <use href="#lf-half" transform="translate(260,0) scale(-1,1)" />
+  </g>
+
+  <!-- the heart from the badge -->
+  <path
+    fill="var(--flourish-heart)"
+    d="M130 26 C 128.4 23.6, 121 19.2, 121 14 C 121 10.4, 123.9 8.4, 126.6 9.9
+       C 128.2 10.8, 129.4 12.1, 130 13 C 130.6 12.1, 131.8 10.8, 133.4 9.9
+       C 136.1 8.4, 139 10.4, 139 14 C 139 19.2, 131.6 23.6, 130 26 Z"
+  />
+</svg>
+
+<style>
+  .flourish { max-width: 100%; height: auto; margin-inline: auto; }
+</style>

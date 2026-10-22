@@ -1,0 +1,48 @@
+---
+/*
+ * The no-JavaScript landing spot for the contact form's `action`.
+ *
+ * With JavaScript the form confirms inline and nobody ever sees this page, so
+ * it exists purely so the form still works with scripts blocked or broken.
+ * noindex because it is a dead end for search results.
+ */
+import Base from '../layouts/Base.astro';
+import FlourishRule from '../components/FlourishRule.astro';
+import { BIZ } from '../site.ts';
+---
+
+<Base
+  title="Thanks — Love & Flour Bakery"
+  description="Your message has been sent to Love & Flour Bakery."
+  noindex
+>
+  <section class="section thanks">
+    <div class="shell thanks__inner">
+      <FlourishRule width={220} />
+      <h1 class="thanks__h">Thanks — we've got it.</h1>
+      <p class="lede">
+        We'll get back to you as soon as we can. If it's urgent, call us on{' '}
+        <a href={BIZ.phoneHref}>{BIZ.phone}</a>.
+      </p>
+      <div class="thanks__actions">
+        <a class="btn" href="/">Back to the bakery</a>
+        <a class="link-quiet" href="/about">Read our story</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .thanks { text-align: center; padding-block: clamp(3rem, 9vw, 6rem); }
+  .thanks__inner { max-width: 56ch; margin-inline: auto; }
+  .thanks__h { font-size: var(--step-3); margin: 1.5rem 0 1rem; }
+  .thanks .lede { margin-inline: auto; }
+  .thanks a { color: inherit; }
+  .thanks__actions {
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: center;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(2rem, 5vw, 3rem);
+  }
+  .thanks__actions .btn { color: #fff; }
+</style>

@@ -1,0 +1,123 @@
+---
+import '@fontsource-variable/archivo';
+import '@fontsource-variable/newsreader';
+import '../styles/tokens.css';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { BIZ, HOURS } from '../site.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  /**
+   * Whether this page opens with the full-bleed hero.
+   *
+   * Defaults to false so a new page is safe by default. When false the nav is
+   * rendered solid from the server (no flash of white-on-cream before the
+   * client script runs) and <main> is padded to clear the fixed bar.
+   */
+  hasHero?: boolean;
+  /**
+   * The page opens on its own dark header (not the video hero) that the nav
+   * should sit over, transparent, until it scrolls past. The header carries
+   * `data-nav-over` and clears the nav itself. Unlike `hasHero`, no hero
+   * poster is preloaded.
+   */
+  navOver?: boolean;
+  /** Social preview image. Falls back to the hero poster. */
+  ogImage?: string;
+  /** Keep this page out of search results (e.g. the form's thank-you page). */
+  noindex?: boolean;
+}
+const { title, description, hasHero = false, navOver = false, ogImage, noindex = false } = Astro.props;
+const socialImage = ogImage ?? '/video/hero-poster.jpg';
+
+const dayMap: Record<string, string[]> = {
+  'Monday – Thursday': ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+  'Friday – Saturday': ['Friday', 'Saturday'],
+  'Sunday': ['Sunday'],
+};
+const to24 = (t: string) => {
+  const [, h, m, ap] = t.match(/(\d+):(\d+)(am|pm)/i)!;
+  let hh = Number(h) % 12;
+  if (ap.toLowerCase() === 'pm') hh += 12;
+  return `${String(hh).padStart(2, '0')}:${m}`;
+};
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Bakery',
+  name: BIZ.name,
+  slogan: BIZ.tagline,
+  telephone: BIZ.phone,
+  email: BIZ.email,
+  url: Astro.site?.href,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: BIZ.street,
+    addressLocality: BIZ.city,
+    addressRegion: BIZ.state,
+    postalCode: BIZ.zip,
+    addressCountry: 'US',
+  },
+  servesCuisine: ['Colombian', 'Venezuelan', 'Bakery', 'Cafe'],
+  // The readable menu page; Clover is only the order flow.
+  hasMenu: new URL('/menu', Astro.site ?? Astro.url).href,
+  openingHoursSpecification: HOURS.map((h) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: dayMap[h.days],
+    opens: to24(h.time.split('–')[0].trim()),
+    closes: to24(h.time.split('–')[1].trim()),
+  })),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#FFB3C7" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/* Made from her new badge (tools/prep-images.sh). */}
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {/* Only the hero page benefits from this — elsewhere it is 76KB of nothing.
+        Upright screens get the portrait reel's poster, everything else the
+        landscape one; `media` makes sure only the one that shows is fetched.
+        Keep these queries in step with Hero.astro. */}
+    {hasHero && (
+      <>
+        <link rel="preload" as="image" href="/video/hero-poster.jpg" fetchpriority="high"
+              media="not all and (max-aspect-ratio: 4/5)" />
+        <link rel="preload" as="image" href="/video/hero-portrait-poster.jpg" fetchpriority="high"
+              media="(max-aspect-ratio: 4/5)" />
+      </>
+    )}
+
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+
+  <body>
+    <Nav hasHero={hasHero || navOver} />
+    <main id="main" class={hasHero || navOver ? '' : 'main--offset'}><slot /></main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  /* The nav is fixed. The hero starts at y=0 and sits behind it by design;
+     every other page has to be pushed clear of it. */
+  .main--offset { padding-top: var(--nav-h); }
+</style>

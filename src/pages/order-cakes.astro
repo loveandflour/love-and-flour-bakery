@@ -1,0 +1,1389 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import FlourishRule from '../components/FlourishRule.astro';
+import { BIZ } from '../site.ts';
+import transportEn from '../assets/img/transport-en.jpg';
+import transportEs from '../assets/img/transport-es.jpg';
+import {
+  FLAVORS, ROUND_SIZES, HIGH, SHEETS, LEAD_DAYS, fromPrice, money,
+} from '../data/cakes.ts';
+
+/* Ideas, not add-ons: Vanessa prices decoration herself once she has seen the
+   request, so none of these carry a price. They are prompts for people who
+   don't know what to ask for. */
+const IDEAS = [
+  'Candles',
+  'Writing / message',
+  'Special borders & edges',
+  'Fruit filling inside',
+  'Gold / silver details',
+  'Pearls',
+  'Hearts',
+  'Edible photo print',
+  'Toy topper',
+  'Custom colors',
+  'Wedding-style / tiered details',
+];
+
+/* Everything the in-page script needs to work out estimates, minus the images. */
+const clientData = {
+  lead: LEAD_DAYS,
+  high: HIGH,
+  sheets: SHEETS,
+  flavors: FLAVORS.map(({ img, ...f }) => f),
+};
+---
+
+<Base
+  title="Order a Cake — Love & Flour Bakery"
+  description="Order a cake from Love & Flour Bakery in Silver Spring, MD. Pick a flavor and size, tell us how you'd like it decorated, and we'll call to confirm."
+>
+  <!-- ===================== header ===================== -->
+  <section class="section page-head">
+    <div class="shell">
+      <div class="page-head__inner">
+        <p class="eyebrow">Cakes &amp; celebrations</p>
+        <h1 class="page-head__h">Order a cake</h1>
+        <p class="lede">
+          Pick a flavor and a size, then tell us how you'd like it decorated.
+          We'll call you to go over the details.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The two operational facts, stated once, plainly, before anyone starts. -->
+  <section class="terms">
+    <div class="shell">
+      <p class="terms__lead">
+        <strong>Please order at least {LEAD_DAYS}&nbsp;days before you need your cake.</strong>
+      </p>
+      <p class="terms__text">
+        This is a request, not a purchase. Prices shown are estimates. We'll call to confirm
+        the details and the final price, and you pay once it's confirmed.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== order ===================== -->
+  <section class="order">
+    <div class="shell order__grid">
+      <div class="order__main">
+        <form
+          id="cakeForm"
+          class="order__form"
+          name="cake-order"
+          method="POST"
+          action="/thank-you"
+          enctype="multipart/form-data"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+        >
+          <!-- Required by Netlify: without it the POST isn't attributed to a form
+               and the submission is dropped without any error. -->
+          <input type="hidden" name="form-name" value="cake-order" />
+
+          <!-- First field on purpose: Netlify lists fields in form order, so this
+               plain-English block is the first thing Vanessa reads in the email.
+               Filled in by the script; empty if JavaScript is off, in which case
+               every individual field below still arrives. -->
+          <textarea name="Order summary" id="orderSummary" hidden></textarea>
+
+          <p class="honeypot" aria-hidden="true">
+            <label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+          </p>
+
+          <!-- ============ 1. flavor ============ -->
+          <section class="step" id="step-flavor" aria-labelledby="h-flavor">
+            <header class="step__head">
+              <span class="step__num" aria-hidden="true">1</span>
+              <h2 class="step__h" id="h-flavor">Choose a flavor</h2>
+            </header>
+            <p class="step__intro">
+              The photos show how we usually decorate each cake. You can ask for something
+              different in step&nbsp;3.
+            </p>
+
+            <fieldset class="flavors">
+              <legend class="visually-hidden">Flavor</legend>
+              {FLAVORS.map((f, i) => (
+                <label class={`flavor ${f.img ? '' : 'flavor--text'}`}>
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="Flavor"
+                    value={f.name}
+                    data-id={f.id}
+                    required
+                  />
+                  <span class="flavor__plate">
+                    {f.img ? (
+                      <Image
+                        src={f.img}
+                        alt=""
+                        widths={[240, 400, 640]}
+                        sizes="(max-width: 620px) 44vw, (max-width: 1100px) 28vw, 200px"
+                        loading={i < 4 ? 'eager' : 'lazy'}
+                      />
+                    ) : (
+                      <FlourishRule width={120} class="flavor__flourish" />
+                    )}
+                  </span>
+                  <span class="flavor__name">{f.name}</span>
+                  {f.note && <span class="flavor__note">{f.note}</span>}
+                  <span class="flavor__from">from {money(fromPrice(f))}</span>
+                  <span class="flavor__tick" aria-hidden="true"></span>
+                </label>
+              ))}
+
+              <!-- Last on purpose: the flavors above are the surest bet. -->
+              <label class="flavor flavor--text flavor--other">
+                <input
+                  class="visually-hidden"
+                  type="radio"
+                  name="Flavor"
+                  value="Something else"
+                  data-id="other"
+                  required
+                />
+                <span class="flavor__plate"><span class="flavor__plus" aria-hidden="true">+</span></span>
+                <span class="flavor__name">Something else</span>
+                <span class="flavor__note">Tell us what you have in mind</span>
+                <span class="flavor__tick" aria-hidden="true"></span>
+              </label>
+            </fieldset>
+
+            <div class="reveal reveal--other field" data-panel="other">
+              <label class="field__label" for="oc-custom-flavor">What flavor would you like?</label>
+              <input id="oc-custom-flavor" name="Custom flavor" type="text" autocomplete="off" />
+              <p class="hint">
+                Not every flavor is possible. The ones above are our surest bet, but tell us
+                what you'd like and we'll let you know.
+              </p>
+            </div>
+          </section>
+
+          <!-- ============ 2. size & shape ============ -->
+          <section class="step" id="step-size" aria-labelledby="h-size">
+            <header class="step__head">
+              <span class="step__num" aria-hidden="true">2</span>
+              <h2 class="step__h" id="h-size">Size &amp; shape</h2>
+            </header>
+            <p class="step__intro" id="availability">
+              Not every flavor comes in every size. Pick a flavor first and we'll show
+              what it comes in.
+            </p>
+
+            <fieldset class="group">
+              <legend class="group__legend">Shape</legend>
+              <div class="chips chips--3">
+                <label class="chip">
+                  <input class="visually-hidden" type="radio" name="Shape" value="Round" data-shape="round" id="shape-round" required />
+                  <span class="chip__main">Round</span>
+                  <span class="chip__sub">6" to 12"</span>
+                </label>
+                <label class="chip">
+                  <input class="visually-hidden" type="radio" name="Shape" value="Sheet (rectangular)" data-shape="sheet" id="shape-sheet" required />
+                  <span class="chip__main">Sheet</span>
+                  <span class="chip__sub">Rectangular, for larger groups</span>
+                </label>
+                <label class="chip">
+                  <input class="visually-hidden" type="radio" name="Shape" value="Custom shape" data-shape="custom" id="shape-custom" required />
+                  <span class="chip__main">Custom shape</span>
+                  <span class="chip__sub">Heart, number, other</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- round -->
+            <div class="reveal reveal--round" data-panel="round">
+              <fieldset class="group">
+                <legend class="group__legend">Size</legend>
+                <div class="chips chips--4">
+                  {ROUND_SIZES.map((s) => (
+                    <label class="chip">
+                      <input class="visually-hidden" type="radio" name="Round size" value={`${s}"`} data-size={s} />
+                      <span class="chip__main">{s}&Prime;</span>
+                      <span class="chip__sub" data-est-round={s}>&nbsp;</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="group">
+                <legend class="group__legend">Height</legend>
+                <div class="chips chips--2">
+                  <label class="chip">
+                    <input class="visually-hidden" type="radio" name="Height" value="Standard" data-height="standard" checked />
+                    <span class="chip__main">Standard</span>
+                    <span class="chip__sub">Our usual height</span>
+                  </label>
+                  <label class="chip">
+                    <input class="visually-hidden" type="radio" name="Height" value="Double height" data-height="double" />
+                    <span class="chip__main">Double height</span>
+                    <span class="chip__sub">Twice as tall</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- sheet -->
+            <div class="reveal reveal--sheet" data-panel="sheet">
+              <fieldset class="group">
+                <legend class="group__legend">Sheet size</legend>
+                <div class="chips chips--3">
+                  {SHEETS.map((s) => (
+                    <label class="chip">
+                      <input class="visually-hidden" type="radio" name="Sheet size" value={`${s.label} (serves ${s.serves})`} data-sheet={s.id} />
+                      <span class="chip__main">{s.label}</span>
+                      <span class="chip__meta">Serves {s.serves}</span>
+                      <span class="chip__sub" data-est-sheet={s.id}>&nbsp;</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <p class="hint">Our sheets are rectangular. A full sheet is a whole baking tray.</p>
+            </div>
+
+            <!-- custom shape -->
+            <div class="reveal reveal--custom field" data-panel="custom">
+              <label class="field__label" for="oc-custom-shape">What shape and size?</label>
+              <input id="oc-custom-shape" name="Custom shape" type="text" placeholder="e.g. a heart, the number 5, two tiers" autocomplete="off" />
+            </div>
+
+            <!-- Shown when the flavor doesn't usually come this way. Not an error:
+                 the request still goes through, it just has no estimate. -->
+            <p class="custom-note" id="customNote" role="status" hidden></p>
+
+            <div class="field field--short">
+              <label class="field__label" for="oc-people">
+                About how many people? <span class="field__note">(optional)</span>
+              </label>
+              <input id="oc-people" name="People to serve" type="text" inputmode="numeric" autocomplete="off" />
+            </div>
+          </section>
+
+          <!-- ============ 3. decoration ============ -->
+          <section class="step" id="step-decor" aria-labelledby="h-decor">
+            <header class="step__head">
+              <span class="step__num" aria-hidden="true">3</span>
+              <h2 class="step__h" id="h-decor">Decoration</h2>
+            </header>
+            <p class="step__intro">
+              Describe it in your own words. A photo of something you like helps a lot.
+            </p>
+
+            <fieldset class="group">
+              <legend class="group__legend">
+                Ideas: things we can do <span class="field__note">(tap any that apply)</span>
+              </legend>
+              <div class="ideas">
+                {IDEAS.map((idea, i) => (
+                  <label class="idea">
+                    <input
+                      class="visually-hidden"
+                      type="checkbox"
+                      name="Decoration ideas"
+                      value={idea}
+                      id={i === 1 ? 'idea-writing' : undefined}
+                    />
+                    <span>{idea}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <div class="reveal reveal--writing field" data-panel="writing">
+              <label class="field__label" for="oc-writing">What should it say?</label>
+              <input id="oc-writing" name="Writing on the cake" type="text" placeholder="e.g. Feliz cumpleaños, Ana" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="oc-details">
+                Describe your cake <span class="field__note">(optional)</span>
+              </label>
+              <textarea
+                id="oc-details"
+                name="Decoration details"
+                rows="5"
+                placeholder="Colors, theme, the occasion, anything you have in mind"
+              ></textarea>
+            </div>
+
+            <div class="field photos">
+              <span class="field__label" id="photos-label">
+                Inspiration photos <span class="field__note">(optional, up to 3)</span>
+              </span>
+              {[1, 2, 3].map((n) => (
+                <div class="photo" data-photo={n}>
+                  <label class="visually-hidden" for={`oc-photo-${n}`}>Inspiration photo {n}</label>
+                  <input id={`oc-photo-${n}`} name={`Inspiration photo ${n}`} type="file" accept="image/*" aria-describedby="photos-label" />
+                </div>
+              ))}
+              <button type="button" class="link-quiet photos__add" id="addPhoto" hidden>Add another photo</button>
+            </div>
+
+            <p class="hint hint--price">
+              Decorations can change the price. We'll go over it when we call.
+            </p>
+          </section>
+
+          <!-- ============ 4. date & details ============ -->
+          <section class="step" id="step-details" aria-labelledby="h-details">
+            <header class="step__head">
+              <span class="step__num" aria-hidden="true">4</span>
+              <h2 class="step__h" id="h-details">Date &amp; your details</h2>
+            </header>
+            <p class="step__intro">
+              Pick up at {BIZ.street}, {BIZ.city}. Need it delivered? Mention it in the notes
+              below.
+            </p>
+
+            <div class="pair">
+              <div class="field">
+                <label class="field__label" for="oc-date">Date needed</label>
+                <input id="oc-date" name="Date needed" type="date" required aria-describedby="date-hint" />
+                <p class="hint" id="date-hint">At least {LEAD_DAYS} days from today.</p>
+              </div>
+              <div class="field">
+                <label class="field__label" for="oc-time">
+                  Pickup time <span class="field__note">(optional)</span>
+                </label>
+                <input id="oc-time" name="Pickup time" type="text" placeholder="e.g. around 2pm" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="pair">
+              <div class="field">
+                <label class="field__label" for="oc-name">Your name</label>
+                <input id="oc-name" name="Name" type="text" autocomplete="name" required />
+              </div>
+              <div class="field">
+                <label class="field__label" for="oc-phone">Phone</label>
+                <input id="oc-phone" name="Phone" type="tel" autocomplete="tel" inputmode="tel" minlength="10" required />
+              </div>
+            </div>
+
+            <div class="pair">
+              <div class="field">
+                <label class="field__label" for="oc-email">
+                  Email <span class="field__note">(optional)</span>
+                </label>
+                <input id="oc-email" name="Email" type="email" autocomplete="email" />
+              </div>
+              <fieldset class="field field--radios">
+                <legend class="field__label">Okay to text you?</legend>
+                <div class="chips chips--2 chips--tight">
+                  <label class="chip">
+                    <input class="visually-hidden" type="radio" name="Okay to text" value="Text or call is fine" checked />
+                    <span class="chip__main">Text or call</span>
+                  </label>
+                  <label class="chip">
+                    <input class="visually-hidden" type="radio" name="Okay to text" value="Call only, please" />
+                    <span class="chip__main">Call only</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="field">
+              <label class="field__label" for="oc-notes">
+                Anything else? <span class="field__note">(optional)</span>
+              </label>
+              <textarea id="oc-notes" name="Other notes" rows="3"></textarea>
+            </div>
+          </section>
+
+          <!-- ============ recap + send ============ -->
+          <section class="recap" id="recap" aria-labelledby="h-recap">
+            <h2 class="recap__h" id="h-recap">Your request</h2>
+            <dl class="recap__list" id="recapList" hidden></dl>
+            <p class="recap__terms">
+              Nothing is charged online. We'll call you to confirm the details and the final
+              price, and you pay once it's confirmed.
+            </p>
+            <button class="btn recap__submit" type="submit">Send cake request</button>
+            <p class="recap__error" id="cakeError" role="alert" hidden>
+              Something went wrong sending that. Please try again, or call us on{' '}
+              <a href={BIZ.phoneHref}>{BIZ.phone}</a>.
+            </p>
+            <p class="recap__error" id="cakeTooBig" role="alert" hidden>
+              Those photos are too large to send together. Please remove one and try again.
+            </p>
+          </section>
+        </form>
+
+        <div class="sent" id="cakeSent" role="status" tabindex="-1" hidden>
+          <FlourishRule width={200} />
+          <h2 class="sent__h">We've got your request.</h2>
+          <p>
+            We'll call you<span id="sentPhone"></span> to go over the details and confirm the
+            price. Nothing has been charged.
+          </p>
+          <p>
+            In a hurry? Call us on <a href={BIZ.phoneHref}>{BIZ.phone}</a>.
+          </p>
+          <a class="link-quiet sent__transport" href="#transport">
+            Picking it up? How to get your cake home safely ↓
+          </a>
+        </div>
+      </div>
+
+      <!-- ===================== running summary (desktop) ===================== -->
+      <aside class="summary" id="summary" aria-label="Your cake so far">
+        <p class="summary__h">Your cake</p>
+        <dl class="summary__list">
+          <div><dt>Flavor</dt><dd data-sum="flavor">Not chosen yet</dd></div>
+          <div><dt>Size</dt><dd data-sum="size">Not chosen yet</dd></div>
+          <div><dt>Estimate</dt><dd data-sum="est">—</dd></div>
+        </dl>
+        <a class="link-quiet summary__next" data-next href="#step-flavor">Choose a flavor</a>
+        <p class="summary__terms">Estimate only. We confirm the final price by phone.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===================== getting it home ===================== -->
+  <!-- Vanessa's own transport graphics, English and Spanish. The text is all
+       inside the pictures, so the alt text carries it in full. The switch is
+       two radios and CSS :has(), so it works without the script; browsers
+       without :has() just show both. Outside the form, so never submitted. -->
+  <section class="section transport" id="transport" aria-labelledby="h-transport">
+    <div class="shell transport__inner">
+      <p class="eyebrow">Pickup</p>
+      <h2 class="transport__h" id="h-transport">Getting your cake home safely</h2>
+      <p class="transport__lead">Cakes travel best flat on the floor, never on a seat or a lap.</p>
+
+      <fieldset class="transport__lang">
+        <legend class="visually-hidden">Language</legend>
+        <div class="chips chips--2 chips--tight">
+          <label class="chip">
+            <input class="visually-hidden" type="radio" name="transport-lang" value="en" id="transport-en" checked />
+            <span class="chip__main">English</span>
+          </label>
+          <label class="chip" lang="es">
+            <input class="visually-hidden" type="radio" name="transport-lang" value="es" id="transport-es" />
+            <span class="chip__main">Español</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <figure class="transport__fig transport__fig--en">
+        <Image
+          src={transportEn}
+          alt="Transport your cake with care. 1. Passenger floor: place the box on a clean, flat floor in front of the passenger seat. 2. Trunk floor: use a cool, level trunk floor and keep the box from sliding. Never on seats or laps. Drive slowly and avoid sudden stops, sharp turns and bumps. Keep the car cool and out of direct sunlight, and go straight to your destination. Keep the box closed and level. Questions: 301-433-2105."
+          widths={[400, 700, 1040]}
+          sizes="(max-width: 600px) 100vw, 520px"
+          loading="lazy"
+        />
+      </figure>
+      <figure class="transport__fig transport__fig--es" lang="es">
+        <Image
+          src={transportEs}
+          alt="Transporta tu cake con cuidado. 1. Piso del pasajero: coloca la caja en el piso, frente al asiento del pasajero, sobre una superficie plana y limpia. 2. Piso del baúl: usa el piso del baúl solo si está fresco y nivelado, y evita que la caja se deslice. ¡Nunca en los asientos ni en las piernas! Maneja despacio y evita frenazos, giros bruscos y baches. Mantén el carro fresco, evita el sol directo y ve a tu destino sin demoras. Mantén la caja cerrada y siempre horizontal. Preguntas: 301-433-2105."
+          widths={[400, 700, 1040]}
+          sizes="(max-width: 600px) 100vw, 520px"
+          loading="lazy"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <!-- ===================== running summary (phones) ===================== -->
+  <div class="bar" id="cakeBar" hidden>
+    <div class="bar__text">
+      <span class="bar__what" data-sum="short"></span>
+      <span class="bar__est" data-sum="est"></span>
+    </div>
+    <a class="bar__next" data-next href="#step-size">Next</a>
+  </div>
+
+  <script type="application/json" id="cakeData" set:html={JSON.stringify(clientData)} />
+</Base>
+
+<style>
+  /* ---------------- header ---------------- */
+  .page-head {
+    padding-block: clamp(2.25rem, 5vw, 3.25rem) clamp(1.25rem, 3vw, 2rem);
+  }
+  .page-head__inner { max-width: 58ch; }
+  .page-head .eyebrow { color: var(--ink-faint); margin-bottom: 0.45rem; }
+  .page-head__h {
+    font-size: var(--step-3);
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+  }
+
+  .terms { background: var(--blush-wash); }
+  .terms .shell { padding-block: clamp(1.25rem, 3vw, 1.75rem); }
+  .terms__lead { margin-bottom: 0.35rem; }
+  .terms__lead strong { font-weight: 600; }
+  .terms__text { color: var(--ink-soft); }
+
+  /* ---------------- layout ---------------- */
+  .order { padding-block: clamp(2.5rem, 6vw, 4.5rem) var(--section-y); }
+  .order__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+  }
+  @media (min-width: 1000px) {
+    .order__grid { grid-template-columns: minmax(0, 1fr) 16.5rem; }
+  }
+
+  /* ---------------- steps ---------------- */
+  .step {
+    scroll-margin-top: calc(var(--nav-h) + 1rem);
+    padding-bottom: clamp(2.5rem, 6vw, 3.75rem);
+    margin-bottom: clamp(2.5rem, 6vw, 3.75rem);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .step__head { display: flex; align-items: center; gap: 0.9rem; margin-bottom: 0.6rem; }
+  .step__num {
+    flex: none;
+    display: grid; place-items: center;
+    width: 2.1rem; height: 2.1rem;
+    border-radius: 50%;
+    background: var(--blush);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step--1);
+  }
+  .step__h { font-size: var(--step-2); }
+  .step__intro { color: var(--ink-soft); margin-bottom: clamp(1.5rem, 3.5vw, 2rem); }
+  /* Written by the script, so outside Astro's scoping. */
+  .step__intro :global(strong) { color: var(--ink); font-weight: 600; }
+
+  .hint { font-size: var(--step--1); color: var(--ink-soft); margin: 0.5rem 0 0; }
+  .hint--price { margin-top: 1.5rem; }
+
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+
+  .group + .group,
+  .group + .hint { margin-top: 1.5rem; }
+  .group__legend {
+    padding: 0;
+    margin-bottom: 0.7rem;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* ---------------- flavor cards ---------------- */
+  .flavors {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(0.6rem, 1.6vw, 1rem);
+  }
+  @media (max-width: 1100px) { .flavors { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 620px)  { .flavors { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .flavor {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    padding: clamp(0.75rem, 2vw, 1.1rem) 0.6rem clamp(0.9rem, 2vw, 1.2rem);
+    background: var(--blush-wash);
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px transparent;
+    transition: box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .flavor:hover { box-shadow: inset 0 0 0 1px var(--blush); }
+  .flavor:has(input:checked) {
+    background: #fff;
+    box-shadow: inset 0 0 0 2px var(--ink);
+  }
+  .flavor:has(input:focus-visible) {
+    outline: 3px solid var(--brand-red);
+    outline-offset: 2px;
+  }
+
+  /* Same frame as the cutouts (1200x1000), so text cards line up with photo cards. */
+  .flavor__plate {
+    display: grid; place-items: center;
+    width: 88%;
+    aspect-ratio: 6 / 5;
+    margin-bottom: 0.6rem;
+  }
+  .flavor__plate :global(img) {
+    width: 100%; height: auto;
+    filter: drop-shadow(0 10px 10px rgba(59, 36, 27, 0.2));
+    transition: transform 0.3s ease;
+  }
+  .flavor:hover .flavor__plate :global(img) { transform: translateY(-3px); }
+
+  .flavor__name {
+    font-family: var(--font-display);
+    font-size: clamp(0.8rem, 0.76rem + 0.2vw, 0.92rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.25;
+  }
+  .flavor__note {
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    line-height: 1.35;
+    margin-top: 0.25rem;
+  }
+  .flavor__from {
+    margin-top: auto;
+    padding-top: 0.35rem;
+    font-size: var(--step--1);
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .flavor--text { background: var(--ground-deep); }
+  .flavor--text .flavor__plate { width: 70%; }
+  .flavor__plus {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 300;
+    color: var(--ink-faint);
+    line-height: 1;
+  }
+
+  /* Selected tick, top-right. */
+  .flavor__tick {
+    position: absolute; top: 0.55rem; right: 0.55rem;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--ink);
+    opacity: 0; transform: scale(0.6);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .flavor__tick::after {
+    content: '';
+    position: absolute; left: 0.5rem; top: 0.3rem;
+    width: 0.38rem; height: 0.68rem;
+    border: solid #fff; border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .flavor:has(input:checked) .flavor__tick { opacity: 1; transform: none; }
+
+  /* ---------------- choice chips ---------------- */
+  .chips { display: grid; gap: 0.6rem; }
+  .chips--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .chips--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chips--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 620px) {
+    .chips--3 { grid-template-columns: 1fr; }
+    .chips--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* position: relative on every chip and idea: the real inputs inside are
+     visually hidden (absolutely positioned), and without a positioned parent
+     they land far off to the right on phones and widen the whole page. */
+  .chip {
+    position: relative;
+    display: flex; flex-direction: column; justify-content: center;
+    gap: 0.1rem;
+    min-height: 3.6rem;
+    padding: 0.7rem 0.95rem;
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .chip:hover { border-color: var(--ink-faint); }
+  .chip:has(input:checked) {
+    border-color: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--ink);
+    background: var(--blush-wash);
+  }
+  .chip:has(input:focus-visible) { outline: 3px solid var(--brand-red); outline-offset: 2px; }
+  .chip:has(input:disabled) { cursor: default; }
+
+  .chip__main {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-0);
+    letter-spacing: -0.005em;
+  }
+  .chip__meta,
+  .chip__sub { font-size: var(--step--1); color: var(--ink-soft); line-height: 1.35; }
+  .chip__sub { font-variant-numeric: tabular-nums; }
+  .chip__sub.is-custom { color: var(--ink-faint); font-style: italic; }
+
+  .chips--tight .chip { min-height: 0; padding-block: 0.8rem; }
+
+  /* ---------------- reveal panels ---------------- */
+  /* Panels follow the choice above them with CSS alone, so this still works if
+     the script never runs. Browsers without :has() just show every panel. */
+  .reveal { margin-top: 1.5rem; }
+  @supports selector(:has(*)) {
+    .reveal { display: none; }
+    .order__form:has(#shape-round:checked) .reveal--round,
+    .order__form:has(#shape-sheet:checked) .reveal--sheet { display: block; }
+    /* These three are also .field, which is a flex column. */
+    .order__form:has([data-id="other"]:checked) .reveal--other,
+    .order__form:has(#shape-custom:checked) .reveal--custom,
+    .order__form:has(#idea-writing:checked) .reveal--writing { display: flex; }
+  }
+
+  .custom-note {
+    margin: 1.5rem 0 0;
+    padding: 0.9rem 1.1rem;
+    max-width: none;
+    background: var(--ground-deep);
+    border-left: 3px solid var(--blush);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+  .custom-note :global(strong) { font-weight: 600; }
+
+  .field--short { margin-top: 1.75rem; max-width: 16rem; }
+
+  /* ---------------- decoration ideas ---------------- */
+  .ideas { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .idea { position: relative; cursor: pointer; }
+  .idea span {
+    display: inline-flex; align-items: center; gap: 0.45em;
+    padding: 0.5rem 0.9rem;
+    background: #fff;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    font-size: var(--step--1);
+    line-height: 1.3;
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+  .idea span::before {
+    content: '+';
+    font-family: var(--font-display);
+    color: var(--ink-faint);
+  }
+  .idea:hover span { border-color: var(--ink-faint); }
+  .idea input:checked + span {
+    background: var(--blush-wash);
+    border-color: var(--ink);
+  }
+  .idea input:checked + span::before { content: '✓'; color: var(--ink); }
+  .idea input:focus-visible + span { outline: 3px solid var(--brand-red); outline-offset: 2px; }
+
+  .step .field { margin-top: 1.5rem; }
+  .step .reveal.field { margin-top: 1.5rem; }
+
+  /* ---------------- photos ---------------- */
+  .photo input[type='file'] {
+    padding: 0.65em 0.75em;
+    font-size: var(--step--1);
+    background: #fff;
+    cursor: pointer;
+  }
+  .photo input[type='file']::file-selector-button {
+    margin-right: 0.9em;
+    padding: 0.5em 0.9em;
+    border: 1px solid var(--ink-faint);
+    border-radius: 2px;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .photo + .photo { margin-top: 0.5rem; }
+  .photos__add {
+    align-self: flex-start;
+    margin-top: 0.75rem;
+    background: none; border-width: 0 0 1px; padding: 0 0 2px;
+    color: var(--ink); cursor: pointer;
+  }
+
+  /* ---------------- details ---------------- */
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 clamp(1rem, 3vw, 1.75rem);
+  }
+  @media (max-width: 620px) { .pair { grid-template-columns: 1fr; } }
+  .pair .field { margin-top: 1.5rem; }
+  .field--radios legend { padding: 0; margin-bottom: 0.45rem; }
+
+  /* ---------------- recap ---------------- */
+  .recap {
+    scroll-margin-top: calc(var(--nav-h) + 1rem);
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    background: var(--blush-wash);
+    border-radius: 3px;
+  }
+  .recap__h { font-size: var(--step-1); margin-bottom: 1rem; }
+  .recap__list { margin: 0 0 1.25rem; }
+  /* The recap rows are built by the script, so they need :global(). */
+  .recap__list > :global(div) {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--blush) 55%, transparent);
+  }
+  @media (max-width: 480px) {
+    .recap__list > :global(div) { grid-template-columns: 1fr; gap: 0.1rem; }
+  }
+  .recap__list :global(dt) {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-top: 0.15em;
+  }
+  .recap__list :global(dd) { margin: 0; overflow-wrap: anywhere; white-space: pre-line; }
+  .recap__list :global(.is-missing) { color: var(--ink-faint); font-style: italic; }
+  .recap__list :global(.is-custom) { font-weight: 600; }
+  .recap__terms { font-size: var(--step--1); color: var(--ink-soft); }
+  .recap__submit { margin-top: 1.25rem; border: 0; cursor: pointer; }
+  .recap__submit:disabled { opacity: 0.7; cursor: progress; transform: none; }
+  .recap__error { margin-top: 1rem; color: var(--brand-red-deep); font-size: var(--step--1); }
+
+  .sent { padding-block: clamp(1rem, 3vw, 2rem); outline: none; }
+  .sent__transport { display: inline-block; margin-top: 0.5rem; color: var(--ink); }
+
+  /* ---------------- getting it home ---------------- */
+  .transport { background: var(--blush-wash); text-align: center; }
+  .transport__inner { max-width: 640px; }
+  .transport .eyebrow { color: var(--ink-faint); margin-bottom: 0.45rem; }
+  .transport__h { font-size: var(--step-2); margin-bottom: 0.75rem; }
+  .transport__lead { color: var(--ink-soft); margin: 0 auto 1.5rem; }
+  .transport__lang { max-width: 16rem; margin: 0 auto clamp(1.5rem, 4vw, 2.25rem); }
+  .transport__lang .chip { align-items: center; }
+
+  .transport__fig { margin: 0 auto; max-width: 520px; }
+  .transport__fig :global(img) {
+    width: 100%; height: auto;
+    /* Her graphics are circles on a white square: clip to the circle so the
+       white corners don't show on the blush ground. */
+    border-radius: 50%;
+    box-shadow: 0 14px 30px rgba(59, 36, 27, 0.14);
+  }
+  /* Without :has() both show; give the second one some room. */
+  .transport__fig + .transport__fig { margin-top: 2rem; }
+  @supports selector(:has(*)) {
+    .transport__fig + .transport__fig { margin-top: 0; }
+    .transport:has(#transport-en:checked) .transport__fig--es,
+    .transport:has(#transport-es:checked) .transport__fig--en { display: none; }
+  }
+  .sent__h { font-size: var(--step-2); margin: 1.25rem 0 0.75rem; }
+
+  /* ---------------- summary card (desktop) ---------------- */
+  .summary {
+    display: none;
+    position: sticky;
+    top: calc(var(--nav-h) + 1.5rem);
+    padding: 1.4rem 1.4rem 1.25rem;
+    background: var(--ground-deep);
+    border-radius: 3px;
+  }
+  @media (min-width: 1000px) { .summary { display: block; } }
+  .summary__h {
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.75rem;
+  }
+  .summary__list { margin: 0 0 1.25rem; }
+  .summary__list > div { padding: 0.5rem 0; border-bottom: 1px solid var(--hairline); }
+  .summary__list dt { font-size: var(--step--1); color: var(--ink-faint); }
+  .summary__list dd { margin: 0; line-height: 1.4; }
+  .summary__list dd.is-empty { color: var(--ink-faint); }
+  .summary__list dd.is-custom { font-style: italic; color: var(--ink-soft); }
+  .summary__list [data-sum='est']:not(.is-empty):not(.is-custom) {
+    font-family: var(--font-display); font-weight: 600; font-size: var(--step-1);
+  }
+  .summary__next { color: var(--ink); }
+  .summary__terms { margin-top: 1.25rem; font-size: var(--step--1); color: var(--ink-faint); line-height: 1.45; }
+
+  /* ---------------- bottom bar (phones) ---------------- */
+  .bar {
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 90;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.7rem var(--gutter) calc(0.7rem + env(safe-area-inset-bottom));
+    background: var(--ground);
+    border-top: 1px solid var(--hairline);
+    box-shadow: 0 -6px 18px rgba(59, 36, 27, 0.08);
+    transform: translateY(0);
+    transition: transform 0.25s ease;
+  }
+  .bar[hidden] { display: flex; transform: translateY(110%); visibility: hidden; transition: transform 0.25s ease, visibility 0s 0.25s; }
+  @media (min-width: 1000px) { .bar, .bar[hidden] { display: none; } }
+  .bar__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+  .bar__what {
+    font-size: var(--step--1);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .bar__est { font-family: var(--font-display); font-weight: 600; font-size: var(--step--1); }
+  .bar__est.is-custom { font-family: var(--font-body); font-weight: 400; font-style: italic; color: var(--ink-soft); }
+  .bar__next {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var form = document.getElementById('cakeForm');
+    var dataEl = document.getElementById('cakeData');
+    if (!form || !dataEl) return;
+
+    var DATA = JSON.parse(dataEl.textContent);
+    var byId = {};
+    DATA.flavors.forEach(function (f) { byId[f.id] = f; });
+    var sheetById = {};
+    DATA.sheets.forEach(function (s) { sheetById[s.id] = s; });
+
+    var $ = function (id) { return document.getElementById(id); };
+    var all = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+    var money = function (n) { return '$' + n.toFixed(2); };
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var summaryField = $('orderSummary');
+    var customNote = $('customNote');
+    var availability = $('availability');
+    var recapList = $('recapList');
+    var bar = $('cakeBar');
+    var recap = $('recap');
+    var dateInput = $('oc-date');
+
+    function checked(name) { return form.querySelector('input[name="' + name + '"]:checked'); }
+    function val(name) { var el = form.elements[name]; return el && el.value ? el.value.trim() : ''; }
+
+    /* ---------- dates ---------- */
+    function isoDate(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function niceDate(iso) {
+      var p = iso.split('-');
+      return new Date(+p[0], p[1] - 1, +p[2]).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+    var earliest = new Date();
+    earliest.setDate(earliest.getDate() + DATA.lead);
+    var minIso = isoDate(earliest);
+    dateInput.min = minIso;
+    $('date-hint').textContent = 'We need at least ' + DATA.lead + ' days. The earliest date is ' + niceDate(minIso) + '.';
+    function checkDate() {
+      var v = dateInput.value;
+      dateInput.setCustomValidity(v && v < minIso
+        ? 'We need at least ' + DATA.lead + " days' notice. The earliest date is " + niceDate(minIso) + '. For anything sooner, please call us.'
+        : '');
+    }
+    dateInput.addEventListener('input', checkDate);
+    dateInput.addEventListener('change', checkDate);
+
+    /* ---------- pricing ---------- */
+    // Returns a number (estimate), null (not usually available: custom request)
+    // or undefined (nothing to price yet).
+    function priceFor(flavor, shape, key, height) {
+      if (!flavor || !shape || !key) return undefined;
+      if (flavor.id === 'other' || shape === 'custom') return null;
+      if (shape === 'round') {
+        if (flavor.round[key] == null) return null;
+        return height === 'double' ? DATA.high[key] : flavor.round[key];
+      }
+      if (shape === 'sheet') {
+        if (flavor.sheet === 'all') return sheetById[key].price;
+        return flavor.sheet && flavor.sheet[key] != null ? flavor.sheet[key] : null;
+      }
+      return null;
+    }
+
+    function listJoin(items) {
+      if (items.length < 2) return items.join('');
+      return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+    }
+    function comesIn(flavor) {
+      var parts = [];
+      var rounds = Object.keys(flavor.round).sort(function (a, b) { return a - b; });
+      if (rounds.length) parts.push(listJoin(rounds.map(function (s) { return s + '"'; })) + (rounds.length > 1 ? ' rounds' : ' round'));
+      if (flavor.sheet === 'all') parts.push('every sheet size');
+      else if (flavor.sheet) parts.push(listJoin(Object.keys(flavor.sheet).map(function (k) { return sheetById[k].label.toLowerCase() + 's'; })));
+      return listJoin(parts);
+    }
+
+    /* ---------- reading the form ---------- */
+    function read() {
+      var fl = checked('Flavor');
+      var flavor = fl ? (fl.dataset.id === 'other' ? { id: 'other', name: 'Something else' } : byId[fl.dataset.id]) : null;
+      var shapeEl = checked('Shape');
+      var shape = shapeEl ? shapeEl.dataset.shape : null;
+      var heightEl = checked('Height');
+      var height = heightEl ? heightEl.dataset.height : 'standard';
+      var key = null, sizeText = '';
+      if (shape === 'round') {
+        var r = checked('Round size');
+        if (r) { key = r.dataset.size; sizeText = key + '" round' + (height === 'double' ? ', double height' : ''); }
+      } else if (shape === 'sheet') {
+        var s = checked('Sheet size');
+        if (s) { key = s.dataset.sheet; sizeText = sheetById[key].label + ' (serves ' + sheetById[key].serves + ')'; }
+      } else if (shape === 'custom') {
+        key = 'custom';
+        sizeText = val('Custom shape') ? 'Custom shape: ' + val('Custom shape') : 'Custom shape';
+      }
+      var flavorText = flavor ? (flavor.id === 'other' ? (val('Custom flavor') ? 'Custom: ' + val('Custom flavor') : 'Something else') : flavor.name) : '';
+      var price = priceFor(flavor, shape, key, height);
+      return {
+        flavor: flavor, flavorText: flavorText, shape: shape, height: height,
+        key: key, sizeText: sizeText, price: price,
+        // A real flavor in a size it doesn't usually come in.
+        offMenu: price === null && flavor && flavor.id !== 'other' && shape !== 'custom',
+      };
+    }
+
+    /* ---------- panels: only the active choice is submitted or validated ---------- */
+    function setPanel(name, on) {
+      all('[data-panel="' + name + '"] input').forEach(function (i) { i.disabled = !on; });
+    }
+    function syncPanels(s) {
+      setPanel('other', s.flavor && s.flavor.id === 'other');
+      setPanel('round', s.shape === 'round');
+      setPanel('sheet', s.shape === 'sheet');
+      setPanel('custom', s.shape === 'custom');
+      setPanel('writing', $('idea-writing').checked);
+      $('oc-custom-flavor').required = !!(s.flavor && s.flavor.id === 'other');
+      $('oc-custom-shape').required = s.shape === 'custom';
+      all('input[name="Round size"]').forEach(function (i, n) { i.required = s.shape === 'round' && n === 0; });
+      all('input[name="Sheet size"]').forEach(function (i, n) { i.required = s.shape === 'sheet' && n === 0; });
+    }
+
+    /* ---------- the estimate under each size ---------- */
+    function syncChips(s) {
+      all('[data-est-round]').forEach(function (el) {
+        var p = priceFor(s.flavor, 'round', el.dataset.estRound, s.height);
+        el.textContent = p === undefined ? ' ' : p === null ? (s.flavor.id === 'other' ? 'price to confirm' : 'custom request') : 'est. ' + money(p);
+        el.classList.toggle('is-custom', p === null);
+      });
+      all('[data-est-sheet]').forEach(function (el) {
+        var p = priceFor(s.flavor, 'sheet', el.dataset.estSheet, s.height);
+        el.textContent = p === undefined ? ' ' : p === null ? (s.flavor.id === 'other' ? 'price to confirm' : 'custom request') : 'est. ' + money(p);
+        el.classList.toggle('is-custom', p === null);
+      });
+    }
+
+    function offMenuText(s) {
+      return s.flavor.name + " doesn't usually come as a " + s.sizeText.replace(/ \(.*\)$/, '').toLowerCase();
+    }
+
+    function syncNotes(s) {
+      if (s.flavor && s.flavor.id !== 'other') {
+        availability.innerHTML = '';
+        var b = document.createElement('strong');
+        b.textContent = s.flavor.name;
+        availability.append(b, ' usually comes in ' + comesIn(s.flavor) + '. Double height is available in the same round sizes.');
+      } else if (s.flavor) {
+        availability.textContent = "For a flavor that isn't on our list, pick any size. We'll confirm what's possible and the price when we call.";
+      }
+      if (s.offMenu && s.key) {
+        customNote.innerHTML = '';
+        var t = document.createElement('strong');
+        t.textContent = offMenuText(s) + '.';
+        customNote.append(t, " You can still ask for it. We'll treat it as a custom request and confirm the price when we call.");
+        customNote.hidden = false;
+      } else {
+        customNote.hidden = true;
+      }
+    }
+
+    /* ---------- summary: one list feeds the recap, the side card and the email ---------- */
+    function estText(s) {
+      if (s.price === undefined) return '';
+      return s.price === null ? 'Price to confirm' : money(s.price);
+    }
+    function rows(s) {
+      var r = [];
+      var ideas = all('input[name="Decoration ideas"]:checked').map(function (i) { return i.value; });
+      var photos = all('input[type=file]').filter(function (i) { return i.files && i.files.length; }).length;
+      var date = val('Date needed');
+      var people = val('People to serve');
+      r.push(['Flavor', s.flavorText]);
+      r.push(['Size', s.sizeText]);
+      r.push(['Estimate', estText(s)]);
+      if (s.offMenu && s.key) r.push(['Custom request', offMenuText(s)]);
+      if (s.flavor && s.flavor.id === 'other') r.push(['Custom request', 'Flavor not on our list']);
+      if (s.shape === 'custom') r.push(['Custom request', 'Custom shape']);
+      r.push(['Needed', date ? niceDate(date) + (val('Pickup time') ? ', pickup ' + val('Pickup time') : '') : '']);
+      if (people) r.push(['Serves', 'About ' + people]);
+      r.push(['Name', val('Name')]);
+      var text = checked('Okay to text');
+      r.push(['Phone', val('Phone') ? val('Phone') + (text ? ' (' + text.value.toLowerCase() + ')' : '') : '']);
+      if (val('Email')) r.push(['Email', val('Email')]);
+      if (ideas.length) r.push(['Ideas', ideas.join(', ')]);
+      if ($('idea-writing').checked && val('Writing on the cake')) r.push(['Writing', '“' + val('Writing on the cake') + '”']);
+      if (val('Decoration details')) r.push(['Decoration', val('Decoration details')]);
+      if (photos) r.push(['Photos', photos + ' attached']);
+      if (val('Other notes')) r.push(['Notes', val('Other notes')]);
+      return r;
+    }
+
+    function syncSummary(s) {
+      var r = rows(s);
+
+      // Recap above the Send button.
+      recapList.innerHTML = '';
+      r.forEach(function (row) {
+        var div = document.createElement('div');
+        var dt = document.createElement('dt'); dt.textContent = row[0];
+        var dd = document.createElement('dd'); dd.textContent = row[1] || 'Not filled in yet';
+        if (!row[1]) dd.className = 'is-missing';
+        if (row[0] === 'Custom request') dd.className = 'is-custom';
+        div.append(dt, dd);
+        recapList.append(div);
+      });
+      recapList.hidden = false;
+
+      // The email. Plain text, short labels, the important part first.
+      var lines = ['CAKE REQUEST (call to confirm)'];
+      r.forEach(function (row) { if (row[1]) lines.push(row[0] + ': ' + row[1]); });
+      summaryField.value = lines.join('\n');
+
+      // Side card + phone bar.
+      var est = s.price === undefined ? '' : s.price === null ? 'Price to confirm' : 'est. ' + money(s.price);
+      all('[data-sum="flavor"]').forEach(function (el) { el.textContent = s.flavorText || 'Not chosen yet'; el.classList.toggle('is-empty', !s.flavorText); });
+      all('[data-sum="size"]').forEach(function (el) { el.textContent = s.sizeText || 'Not chosen yet'; el.classList.toggle('is-empty', !s.sizeText); });
+      all('[data-sum="est"]').forEach(function (el) {
+        el.textContent = est || (el.closest('.bar') ? '' : '—');
+        el.classList.toggle('is-empty', !est);
+        el.classList.toggle('is-custom', s.price === null);
+      });
+      all('[data-sum="short"]').forEach(function (el) {
+        el.textContent = [s.flavorText, s.sizeText].filter(Boolean).join(' · ');
+      });
+    }
+
+    /* ---------- "next" link: the first thing still missing ---------- */
+    var current = 'step-flavor';
+    function syncNext(s) {
+      var target, label;
+      if (!s.flavor) { target = 'step-flavor'; label = 'Choose a flavor'; }
+      else if (!s.key) { target = 'step-size'; label = 'Next: size'; }
+      else if (current === 'step-flavor' || current === 'step-size') { target = 'step-decor'; label = 'Next: decoration'; }
+      else if (current === 'step-decor') { target = 'step-details'; label = 'Next: date & details'; }
+      else { target = 'recap'; label = 'Review'; }
+      all('[data-next]').forEach(function (a) {
+        a.href = '#' + target;
+        a.textContent = label;
+      });
+      updateBar();
+    }
+
+    function updateBar() {
+      var s = !!checked('Flavor');
+      var pastRecap = recap.getBoundingClientRect().top < window.innerHeight;
+      bar.hidden = !s || pastRecap || form.hidden;
+    }
+
+    function update() {
+      var s = read();
+      syncPanels(s);
+      syncChips(s);
+      syncNotes(s);
+      syncSummary(s);
+      syncNext(s);
+    }
+
+    form.addEventListener('input', update);
+    form.addEventListener('change', update);
+    window.addEventListener('pageshow', update);
+
+    // Which step is the reader in? Drives the "next" label as they scroll.
+    var steps = ['step-flavor', 'step-size', 'step-decor', 'step-details'].map($);
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        var mid = window.innerHeight * 0.45;
+        steps.forEach(function (el) { if (el.getBoundingClientRect().top < mid) current = el.id; });
+        syncNext(read());
+      });
+    }, { passive: true });
+
+    /* ---------- photos: one per input (Netlify's limit), revealed in turn ---------- */
+    var slots = all('[data-photo]');
+    var addPhoto = $('addPhoto');
+    slots.slice(1).forEach(function (el) { el.hidden = true; });
+    function syncPhotos() {
+      var shown = slots.filter(function (el) { return !el.hidden; });
+      var last = shown[shown.length - 1].querySelector('input');
+      addPhoto.hidden = shown.length === slots.length || !(last.files && last.files.length);
+    }
+    form.addEventListener('change', function (e) { if (e.target.type === 'file') syncPhotos(); });
+    addPhoto.addEventListener('click', function () {
+      var next = slots.filter(function (el) { return el.hidden; })[0];
+      if (!next) return;
+      next.hidden = false;
+      next.querySelector('input').focus();
+      syncPhotos();
+    });
+
+    /* ---------- where a jump to a step lands ---------- */
+    // Land with the divider above the step tucked exactly under the nav, so the
+    // step opens with its full breathing room and no stray line. The nav's
+    // height and the gap both change with screen size, so measure them rather
+    // than guess in CSS. Covers every jump: the flavor pick, the deep link and
+    // the "Next" links.
+    var nav = document.getElementById('siteNav');
+    function syncScrollMargins() {
+      var navH = nav ? nav.getBoundingClientRect().height : 0;
+      ['step-size', 'step-decor', 'step-details', 'recap'].forEach(function (id) {
+        var el = $(id);
+        var gap = parseFloat(getComputedStyle(el.previousElementSibling).marginBottom) || 0;
+        el.style.scrollMarginTop = Math.round(navH + gap) + 'px';
+      });
+    }
+    syncScrollMargins();
+    window.addEventListener('resize', syncScrollMargins);
+
+    /* ---------- picking a flavor moves on to step 2 ---------- */
+    // Only for a tap or click. Arrow keys also change a radio group, and
+    // scrolling away on every arrow press would make the grid unusable from the
+    // keyboard, so the scroll waits for a pointer to have just touched a card.
+    var lastPointer = 0;
+    $('step-flavor').addEventListener('pointerdown', function () { lastPointer = Date.now(); });
+    form.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.name !== 'Flavor' || Date.now() - lastPointer > 1500) return;
+      // A beat to see the tick land on the card before the page moves.
+      setTimeout(function () {
+        var behavior = reduceMotion ? 'auto' : 'smooth';
+        if (t.dataset.id === 'other') {
+          // "Something else" needs its text box, just below the grid, first.
+          var box = $('oc-custom-flavor');
+          box.closest('.reveal').scrollIntoView({ behavior: behavior, block: 'center' });
+          box.focus({ preventScroll: true });
+        } else {
+          $('step-size').scrollIntoView({ behavior: behavior, block: 'start' });
+        }
+      }, 250);
+    });
+
+    /* ---------- deep link: /order-cakes?flavor=black-forest ---------- */
+    var wanted = new URLSearchParams(location.search).get('flavor');
+    var pick = wanted && form.querySelector('input[name="Flavor"][data-id="' + CSS.escape(wanted) + '"]');
+    if (pick) {
+      pick.checked = true;
+      update();
+      // After load, not straight away: the browser restores the scroll position
+      // on load and would put the reader back at the top.
+      var goToSize = function () {
+        setTimeout(function () {
+          $('step-size').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }, 0);
+      };
+      if (document.readyState === 'complete') goToSize();
+      else window.addEventListener('load', goToSize);
+    } else {
+      update();
+    }
+
+    /* ---------- photo shrinking ---------- */
+    // Phone photos are often 4–12 MB and Netlify caps a whole submission at
+    // about 8 MB, so anything big is redrawn at a sensible size first.
+    var MAX_SIDE = 2000;
+    var MAX_TOTAL = 7.5 * 1024 * 1024;
+    function shrink(file) {
+      if (!/^image\//.test(file.type) || file.size < 1.2 * 1024 * 1024 || !window.createImageBitmap) {
+        return Promise.resolve(file);
+      }
+      return createImageBitmap(file).then(function (bmp) {
+        var scale = Math.min(1, MAX_SIDE / Math.max(bmp.width, bmp.height));
+        var c = document.createElement('canvas');
+        c.width = Math.round(bmp.width * scale);
+        c.height = Math.round(bmp.height * scale);
+        c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+        return new Promise(function (res) {
+          c.toBlob(function (b) {
+            res(b && b.size < file.size
+              ? new File([b], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' })
+              : file);
+          }, 'image/jpeg', 0.85);
+        });
+      }).catch(function () { return file; });
+    }
+
+    function buildBody() {
+      update();
+      var fd = new FormData(form);
+      // Several ticked ideas become one readable line in the email.
+      var ideas = fd.getAll('Decoration ideas');
+      fd.delete('Decoration ideas');
+      if (ideas.length) fd.set('Decoration ideas', ideas.join(', '));
+
+      var names = all('input[type=file]').map(function (i) { return i.name; });
+      return Promise.all(names.map(function (name) {
+        var f = fd.get(name);
+        if (!f || !f.size) { fd.delete(name); return 0; }
+        return shrink(f).then(function (small) { fd.set(name, small, small.name); return small.size; });
+      })).then(function (sizes) {
+        var total = sizes.reduce(function (a, b) { return a + b; }, 0);
+        if (total > MAX_TOTAL) throw new Error('too-big');
+        return fd;
+      });
+    }
+
+    /* ---------- send ---------- */
+    var error = $('cakeError');
+    var tooBig = $('cakeTooBig');
+    var sent = $('cakeSent');
+    form.addEventListener('submit', function (e) {
+      update();
+      checkDate();
+      if (!form.checkValidity()) return;
+
+      e.preventDefault();
+      error.hidden = true;
+      tooBig.hidden = true;
+      var btn = form.querySelector('button[type=submit]');
+      var label = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
+      buildBody()
+        .then(function (fd) {
+          // Multipart, not URL-encoded, because of the photos. No Content-Type
+          // header: the browser sets it, with the boundary.
+          return fetch(location.pathname, { method: 'POST', body: fd });
+        })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          var phone = val('Phone');
+          $('sentPhone').textContent = phone ? ' at ' + phone : '';
+          form.hidden = true;
+          // Not `hidden`: the card's own display rule would win over it.
+          $('summary').style.display = 'none';
+          bar.hidden = true;
+          sent.hidden = false;
+          sent.focus({ preventScroll: true });
+          sent.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
+        })
+        .catch(function (err) {
+          (err && err.message === 'too-big' ? tooBig : error).hidden = false;
+          btn.disabled = false;
+          btn.textContent = label;
+        });
+    });
+  })();
+</script>

@@ -1,0 +1,505 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { CLOVER } from '../site.ts';
+import { MENU, money, type Item } from '../data/menu.ts';
+
+import bread from '../assets/img/bread.jpg';
+import plate from '../assets/img/breakfast-plate.png';
+import licuado from '../assets/img/licuado.jpg';
+import sprinkles from '../assets/img/sprinkles.jpg';
+
+/** "$3.50", "+$3.50" or "$3.75 each". */
+const priceText = (item: Item, n: number) =>
+  `${item.add ? '+' : ''}${money(n)}${item.each ? ' each' : ''}`;
+---
+
+<Base
+  title="Menu — Love & Flour Bakery"
+  navOver
+  description="The Love & Flour menu: breakfast made to order, tacos, tortas and plates from the kitchen, coffee and specialty drinks, licuados and granizadas. Silver Spring, MD."
+>
+  <!-- ===================== header ===================== -->
+  <section class="section page-head" data-nav-over>
+    <!-- The loaves sit under the header, faded back into the warm ground, so
+         the text stays the thing you read. -->
+    <div class="page-head__bg" aria-hidden="true">
+      <Image src={bread} alt="" widths={[800, 1400, 2000, 2400]} sizes="100vw" loading="eager" />
+    </div>
+    <div class="shell">
+      <div class="page-head__inner">
+        <p class="eyebrow">Hecho con amor</p>
+        <h1 class="page-head__h">Menu</h1>
+        <p class="lede">
+          Breakfast made to order, plates from the kitchen, coffee, and fresh drinks.
+        </p>
+        <div class="page-head__actions">
+          <a class="btn" href={CLOVER} target="_blank" rel="noopener">Order online</a>
+          <a class="link-quiet" href="/order-cakes">Ordering a cake?</a>
+        </div>
+        <p class="page-head__note">
+          Prices can change. The menu in the shop is always the current one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== jump bar ===================== -->
+  <!-- Plain anchors, so it works without the script; the script only measures
+       where it should stick and marks the section you're in. -->
+  <nav class="jump" id="jump" aria-label="Menu sections">
+    <div class="jump__inner shell">
+      {MENU.map((s) => (
+        <a class="jump__link" href={`#${s.id}`} data-jump={s.id}>{s.nav}</a>
+      ))}
+    </div>
+  </nav>
+
+  <!-- ===================== sections ===================== -->
+  <div class="menu">
+    {MENU.map((section) => (
+      <>
+        {section.id === 'granizadas' && (
+          <div class="band band--sprinkles" aria-hidden="true">
+            <Image src={sprinkles} alt="" widths={[800, 1400, 2000, 2400]} sizes="100vw" loading="lazy" />
+          </div>
+        )}
+
+        <section class={`msec msec--${section.id}`} id={section.id} aria-labelledby={`h-${section.id}`}>
+          <div class="shell">
+            <header class="msec__head">
+              <p class="eyebrow msec__es" lang="es">{section.es}</p>
+              <h2 class="msec__h" id={`h-${section.id}`}>{section.title}</h2>
+              {section.intro && <p class="msec__intro">{section.intro}</p>}
+            </header>
+
+            {/* The cutout on blush with the cakes' alpha shadow, not a tight
+                photo of the countertop. */}
+            {section.id === 'breakfast' && (
+              <figure class="msec__plate">
+                <Image
+                  src={plate}
+                  alt="A breakfast plate: scrambled eggs, black beans in a stone molcajete with tortillas, fried plantains, cream and fresh cheese"
+                  widths={[600, 900, 1300, 1800]}
+                  sizes="(max-width: 760px) 90vw, 820px"
+                  loading="eager"
+                />
+              </figure>
+            )}
+
+            <div class={`msec__body ${section.id === 'licuados' ? 'msec__body--photo' : ''}`}>
+              {section.id === 'licuados' && (
+                <figure class="msec__side">
+                  <Image
+                    src={licuado}
+                    alt="A strawberry licuado topped with a sugar cookie, wearing the Love & Flour sticker, on a table outside the shop"
+                    widths={[480, 800, 1200]}
+                    sizes="(max-width: 760px) 100vw, 420px"
+                    loading="lazy"
+                  />
+                </figure>
+              )}
+
+              <div class="groups">
+                {section.groups.map((g) => (
+                  <div class="group">
+                    <h3 class="group__h">{g.title}</h3>
+                    {g.note && <p class="group__note">{g.note}</p>}
+
+                    {g.sizes && (
+                      <div class="sizes" aria-hidden="true">
+                        <span></span>
+                        {g.sizes.map((s) => <span>{s}</span>)}
+                      </div>
+                    )}
+
+                    <ul class="items">
+                      {g.items.map((item) => (
+                        <li class={`item ${g.sizes ? 'item--sized' : ''}`}>
+                          <div class="item__row">
+                            <span class="item__name">
+                              {item.name}
+                              {item.tag && <span class="item__tag">{item.tag}</span>}
+                            </span>
+                            {item.price !== undefined && (
+                              <span class="item__price">{priceText(item, item.price)}</span>
+                            )}
+                            {item.prices && item.prices.map((p, i) => (
+                              <span class="item__price">
+                                <span class="visually-hidden">{g.sizes?.[i]}: </span>{money(p)}
+                              </span>
+                            ))}
+                          </div>
+                          {item.desc && <p class="item__desc">{item.desc}</p>}
+                          {item.options && (
+                            <ul class="item__opts">
+                              {item.options.map((o) => (
+                                <li><span>{o.label}</span><span class="item__price">{money(o.price)}</span></li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {g.lines && (
+                      <dl class="lines">
+                        {g.lines.map((l) => (
+                          <div><dt>{l.label}</dt><dd>{l.text}</dd></div>
+                        ))}
+                      </dl>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+    ))}
+  </div>
+
+  <!-- ===================== cakes ===================== -->
+  <section class="cake-note">
+    <div class="shell cake-note__inner">
+      <p class="cake-note__text">
+        <strong>Looking for a cake?</strong> Cakes aren't on this menu. Every one is ordered
+        through us directly, so we can confirm the size, flavor and date with you.
+      </p>
+      <a class="btn cake-note__btn" href="/order-cakes">Order a cake</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------- header ---------------- */
+  .page-head {
+    position: relative;
+    overflow: hidden;
+    /* Runs up under the transparent nav, so it clears the nav itself. */
+    padding-block: calc(var(--nav-h) + clamp(3.5rem, 8vw, 6rem)) clamp(3.5rem, 8vw, 6rem);
+    background: var(--espresso);
+    color: #fff;
+  }
+  .page-head .shell { position: relative; }
+  .page-head__inner { max-width: 58ch; }
+  .page-head__bg { position: absolute; inset: 0; }
+  .page-head__bg :global(img) {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    /* Shallow focus: frame on the sharp upper rows of loaves. */
+    object-position: 50% 22%;
+  }
+  /* Same idea as the home hero: a flat warm-dark layer (a linear dim that keeps
+     the bread's tones), plus a gentle extra shade on the left where the text
+     sits. Warm espresso rather than black so the loaves don't go grey. */
+  .page-head__bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(to right, rgba(36, 22, 17, 0.32) 0%, rgba(36, 22, 17, 0.12) 55%, transparent 80%),
+      rgba(36, 22, 17, 0.5);
+  }
+
+  .page-head .eyebrow { color: var(--blush); margin-bottom: 0.45rem; }
+  .page-head__h {
+    font-size: var(--step-3);
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+  }
+  .page-head .lede { color: rgba(255, 255, 255, 0.9); }
+  .page-head__actions {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .page-head__actions .link-quiet { color: #fff; }
+  .page-head__note {
+    margin-top: 1.25rem;
+    font-size: var(--step--1);
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  /* ---------------- photo bands ---------------- */
+  .band :global(img) {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+  }
+  /* Shallow focus: only the upper rows of loaves are sharp, so frame on those. */
+  .band--sprinkles :global(img) { height: clamp(130px, 14vw, 210px); object-position: 40% 62%; }
+
+  /* ---------------- jump bar ---------------- */
+  /* Sticks just under the site nav. `top` is set by the script from the nav's
+     measured height (it differs by breakpoint); this is the fallback. */
+  .jump {
+    position: sticky;
+    top: var(--nav-h);
+    z-index: 40;
+    background: var(--ground);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .jump__inner {
+    position: relative;   /* so each link's offsetLeft is measured within the bar */
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Fade the last chip on narrow screens so it reads as "scrolls sideways". */
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+  .jump__inner::-webkit-scrollbar { display: none; }
+  /* No fade once there's nothing left to scroll to (set by the script), or when
+     everything fits. */
+  .jump__inner[data-end],
+  .jump__inner[data-fits] { mask-image: none; }
+
+  .jump__link {
+    flex: none;
+    padding: 0.95rem 0 0.8rem;
+    font-family: var(--font-display);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+    border-bottom: 2px solid transparent;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+  .jump__link:hover { color: var(--ink); }
+  .jump__link[aria-current='true'] { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* ---------------- sections ---------------- */
+  .msec {
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+    /* The script replaces this with the real nav + jump bar height. */
+    scroll-margin-top: calc(var(--nav-h) + 3.5rem);
+  }
+  .msec + .msec { border-top: 1px solid var(--hairline); }
+  .msec--licuados { background: var(--blush-wash); }
+
+  .msec__head { max-width: 58ch; margin-bottom: clamp(1.75rem, 4vw, 2.5rem); }
+  .msec__es { color: var(--ink-faint); margin-bottom: 0.4rem; }
+  .msec__h { font-size: var(--step-3); letter-spacing: -0.025em; }
+  .msec__intro { color: var(--ink-soft); margin: 0.75rem 0 0; }
+
+  .msec__plate {
+    margin: 0 0 clamp(2rem, 5vw, 3rem);
+    padding: clamp(1.75rem, 5vw, 3.5rem) clamp(1rem, 4vw, 3rem);
+    background: var(--blush-wash);
+    border-radius: 3px;
+  }
+  .msec__plate :global(img) {
+    display: block;
+    width: 100%;
+    max-width: 820px;
+    height: auto;
+    margin-inline: auto;
+    /* Same alpha drop-shadow as the cakes on the home page. */
+    filter: drop-shadow(0 13px 13px rgba(59, 36, 27, 0.22));
+  }
+
+  .msec__body--photo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 4.5rem);
+    align-items: center;
+  }
+  @media (max-width: 760px) { .msec__body--photo { grid-template-columns: 1fr; } }
+  .msec__side { margin: 0; }
+  .msec__side :global(img) {
+    width: 100%; height: auto;
+    /* Landscape, not portrait: beside only two items a tall photo leaves a
+       column of empty pink. */
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    object-position: 50% 45%;
+    border-radius: 2px;
+  }
+
+  /* ---------------- groups ---------------- */
+  /* Two columns of groups, filled top to bottom like a printed menu, so short
+     and long groups pack without ragged gaps. */
+  .groups { columns: 2; column-gap: clamp(2.5rem, 6vw, 5rem); }
+  .msec__body--photo .groups { columns: 1; }
+  @media (max-width: 860px) { .groups { columns: 1; } }
+
+  .group {
+    break-inside: avoid;
+    margin-bottom: clamp(2.25rem, 5vw, 3rem);
+  }
+  .group__h {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--ink);
+  }
+  .group__note {
+    margin: 0.6rem 0 0;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .sizes,
+  .item--sized .item__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4.25rem 4.25rem;
+    column-gap: 0.75rem;
+    align-items: baseline;
+  }
+  .sizes {
+    padding-top: 0.7rem;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+
+  .items { list-style: none; margin: 0; padding: 0; }
+  .item { padding: 0.9rem 0; border-bottom: 1px solid var(--hairline); }
+
+  .item__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .item__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--step-0);
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+  .item__tag {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.1rem 0.45rem;
+    vertical-align: 0.15em;
+    background: var(--blush);
+    border-radius: 2px;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .item__price {
+    flex: none;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--step-0);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .item__desc {
+    margin: 0.25rem 0 0;
+    font-size: var(--step--1);
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  .item__opts { list-style: none; margin: 0.45rem 0 0; padding: 0; }
+  .item__opts li {
+    display: flex; justify-content: space-between; gap: 1rem;
+    padding: 0.2rem 0;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+  }
+  .item__opts .item__price { font-size: var(--step--1); color: var(--ink); }
+
+  .lines { margin: 1.1rem 0 0; font-size: var(--step--1); }
+  .lines > div + div { margin-top: 0.5rem; }
+  .lines dt {
+    display: inline;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .lines dt::after { content: ' '; }
+  .lines dd { display: inline; margin: 0; color: var(--ink-soft); }
+
+  /* ---------------- cake note ---------------- */
+  .cake-note { background: var(--blush-wash); }
+  .cake-note__inner {
+    display: flex; flex-wrap: wrap;
+    align-items: center; justify-content: space-between;
+    gap: clamp(1rem, 3vw, 2rem);
+    padding-block: clamp(2rem, 5vw, 3rem);
+  }
+  .cake-note__text { margin: 0; max-width: 62ch; }
+  .cake-note__text strong { font-weight: 600; }
+  .cake-note__btn { flex: none; }
+</style>
+
+<script is:inline>
+  (function () {
+    var nav = document.getElementById('siteNav');
+    var jump = document.getElementById('jump');
+    if (!jump) return;
+    var links = Array.prototype.slice.call(jump.querySelectorAll('[data-jump]'));
+    var sections = links.map(function (a) { return document.getElementById(a.dataset.jump); });
+    var inner = jump.querySelector('.jump__inner');
+
+    // Stick right under the real nav, and land each section just below both
+    // bars. The nav is a different height at each breakpoint, so measure.
+    function measure() {
+      var navH = nav ? nav.getBoundingClientRect().height : 0;
+      var barH = jump.getBoundingClientRect().height;
+      jump.style.top = Math.round(navH) + 'px';
+      // -1: the section's top border tucks under the bar's own, not a double line.
+      sections.forEach(function (s) { s.style.scrollMarginTop = Math.round(navH + barH - 1) + 'px'; });
+      return navH + barH;
+    }
+    var offset = measure();
+    window.addEventListener('resize', function () { offset = measure(); edges(); });
+
+    // The bar fades at its right edge to show it scrolls; drop the fade when
+    // everything fits or the last link is in view.
+    function edges() {
+      var fits = inner.scrollWidth <= inner.clientWidth + 1;
+      var end = inner.scrollLeft + inner.clientWidth >= inner.scrollWidth - 2;
+      inner.toggleAttribute('data-fits', fits);
+      inner.toggleAttribute('data-end', !fits && end);
+    }
+    inner.addEventListener('scroll', edges, { passive: true });
+    edges();
+
+    // Mark the section being read, and keep its link in view in the bar.
+    var current = null;
+    function mark() {
+      var line = offset + 24;
+      var active = null;
+      sections.forEach(function (s, i) { if (s.getBoundingClientRect().top <= line) active = i; });
+      if (active === current) return;
+      current = active;
+      links.forEach(function (a, i) {
+        if (i === active) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+      if (active !== null) {
+        var a = links[active];
+        // Scroll the bar only, never the page.
+        inner.scrollTo({ left: a.offsetLeft - inner.clientWidth / 2 + a.offsetWidth / 2, behavior: 'auto' });
+      }
+    }
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; mark(); });
+    }, { passive: true });
+    mark();
+  })();
+</script>
