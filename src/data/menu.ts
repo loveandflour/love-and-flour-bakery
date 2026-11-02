@@ -61,13 +61,13 @@ export const MENU: Section[] = [
     title: 'Breakfast',
     es: 'Desayunos',
     // Her line: "Desayunos frescos preparados al momento".
-    intro: 'Fresh breakfasts, made to order.',
+    intro: 'Fresh breakfast, made to order.',
     groups: [
       {
         title: 'Breakfast combos',
         items: [
           { name: 'Chapín Power', price: 17.49,
-            desc: 'Desayuno Ranchero Chapín with hot coffee and a natural juice.' },
+            desc: 'Desayuno Ranchero Chapín with hot coffee and a fresh juice.' },
           { name: 'Sweet Breakfast', price: 17.99,
             desc: '2 pancakes, eggs and bacon, with a 16 oz fresco (jamaica, mango or horchata) or hot coffee.' },
         ],
@@ -106,7 +106,7 @@ export const MENU: Section[] = [
           { name: 'Bagel Sandwich', price: 8.75,
             desc: 'Ham or bacon with lettuce, tomato, cheese and egg.' },
           { name: 'Crepas Dulces Supreme', price: 11.49,
-            desc: 'Nutella, strawberries, blueberries and banana.' },
+            desc: 'Crepes with Nutella, strawberries, blueberries and banana.' },
         ],
       },
       {
@@ -176,16 +176,16 @@ export const MENU: Section[] = [
         title: 'Snacks',
         items: [
           { name: 'Plátanos con Crema', price: 5.5, desc: 'Plantains with crema.' },
-          { name: 'Papas Locas', price: 7.25 },
-          { name: 'Yuca con Chicharrón', price: 8.25 },
-          { name: 'Panqueques', price: 8.5, desc: 'Pancakes on their own.' },
+          { name: 'Papas Locas', price: 7.25, desc: 'Crazy Potatoes.' },
+          { name: 'Yuca con Chicharrón', price: 8.25, desc: 'Cassava with pork rinds.' },
+          { name: 'Panqueques', price: 8.5, desc: 'Pancakes.' },
         ],
       },
       {
         title: 'Tamales & chuchitos chapines',
         items: [
           { name: 'Tamales', price: 10, desc: 'Three tamales.' },
-          { name: 'Tamal de Elote', price: 3.75, each: true, desc: 'Sweet corn tamal.' },
+          { name: 'Tamal de Elote', price: 3.75, each: true, desc: 'Sweet corn tamale.' },
           { name: 'Chuchitos Chapines', price: 3.75, each: true,
             desc: 'Chicken, pork, chicken with jalapeño, or vegetable.' },
         ],
@@ -194,7 +194,7 @@ export const MENU: Section[] = [
         title: 'Add to your order',
         items: [
           { name: 'Papas Fritas Naturales', price: 3.5, add: true, desc: 'Fresh-cut fries.' },
-          { name: 'Fresco Natural Pequeño', price: 4, add: true, desc: 'A small fresh drink.' },
+          { name: 'Fresco Natural Pequeño', price: 4, add: true, desc: 'A fresh drink.' },
         ],
       },
     ],
@@ -223,7 +223,7 @@ export const MENU: Section[] = [
       {
         title: 'More hot drinks',
         items: [
-          { name: 'Café con Leche', price: 3.25 },
+          { name: 'Café con Leche', price: 3.25, desc: 'Coffee with milk.' },
           { name: 'Chocolate Caliente', price: 3.75, desc: 'Hot chocolate.' },
           { name: 'Té', price: 2.75, desc: 'Tea.' },
         ],
@@ -260,9 +260,9 @@ export const MENU: Section[] = [
           { name: 'Combo Clásico', price: 7.95, desc: 'Latte and a plain croissant.' },
           { name: 'Combo Energía', price: 7.95, desc: 'Mocha Clásico and a glazed donut.' },
           { name: 'Combo Dulce', price: 8.45, desc: 'Caramel Macchiato and a mini vanilla-strawberry cake.' },
-          { name: 'Combo Tres Leches', price: 8.45, desc: 'Any coffee and a slice of tres leches.' },
+          { name: 'Combo Tres Leches', price: 8.45, desc: 'Any coffee and a slice of tres leches cake.' },
           { name: 'Combo Pudín', price: 8.45, desc: 'Cold brew and homemade pudding.' },
-          { name: 'Combo Donas', price: 7.95, desc: 'Vanilla Latte and a chocolate donut.' },
+          { name: 'Combo Donas', price: 7.95, desc: 'Vanilla latte and a chocolate donut.' },
         ],
       },
     ],

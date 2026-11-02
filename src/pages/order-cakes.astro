@@ -38,7 +38,7 @@ const clientData = {
 
 <Base
   title="Order a Cake — Love & Flour Bakery"
-  description="Order a cake from Love & Flour Bakery in Silver Spring, MD. Pick a flavor and size, tell us how you'd like it decorated, and we'll call to confirm."
+  description="Order a cake from Love & Flour Bakery in Silver Spring, MD. Choose a flavor and a size, then tell us how you'd like it decorated, and we'll call to confirm."
 >
   <!-- ===================== header ===================== -->
   <section class="section page-head">
@@ -58,11 +58,11 @@ const clientData = {
   <section class="terms">
     <div class="shell">
       <p class="terms__lead">
-        <strong>Please order at least {LEAD_DAYS}&nbsp;days before you need your cake.</strong>
+        <strong>Please order at least {LEAD_DAYS}&nbsp;days before desired pickup date.</strong>
       </p>
       <p class="terms__text">
-        This is a request, not a purchase. Prices shown are estimates. We'll call to confirm
-        the details and the final price, and you pay once it's confirmed.
+        This is a request form. All prices are estimates. After you submit this request, we will call and confirm
+        the details and the final price for purchase.
       </p>
     </div>
   </section>
@@ -102,8 +102,7 @@ const clientData = {
               <h2 class="step__h" id="h-flavor">Choose a flavor</h2>
             </header>
             <p class="step__intro">
-              The photos show how we usually decorate each cake. You can ask for something
-              different in step&nbsp;3.
+              The photos show the standard decoration for each cake. You can request a custom design in step&nbsp;3.
             </p>
 
             <fieldset class="flavors">
@@ -159,7 +158,7 @@ const clientData = {
               <label class="field__label" for="oc-custom-flavor">What flavor would you like?</label>
               <input id="oc-custom-flavor" name="Custom flavor" type="text" autocomplete="off" />
               <p class="hint">
-                Not every flavor is possible. The ones above are our surest bet, but tell us
+                Not every flavor is possible. The above cakes are tried-and-true favorites, but tell us
                 what you'd like and we'll let you know.
               </p>
             </div>
@@ -172,7 +171,7 @@ const clientData = {
               <h2 class="step__h" id="h-size">Size &amp; shape</h2>
             </header>
             <p class="step__intro" id="availability">
-              Not every flavor comes in every size. Pick a flavor first and we'll show
+              Not every flavor comes in every size. Choose a flavor first and we'll show
               what it comes in.
             </p>
 
@@ -1102,9 +1101,9 @@ const clientData = {
         availability.innerHTML = '';
         var b = document.createElement('strong');
         b.textContent = s.flavor.name;
-        availability.append(b, ' usually comes in ' + comesIn(s.flavor) + '. Double height is available in the same round sizes.');
+        availability.append(b, ' usually comes in ' + comesIn(s.flavor) + '. Double height is available in round sizes.');
       } else if (s.flavor) {
-        availability.textContent = "For a flavor that isn't on our list, pick any size. We'll confirm what's possible and the price when we call.";
+        availability.textContent = "For a flavor that isn't on our list, choose any size. We'll confirm what's possible and tell you the price when we call.";
       }
       if (s.party) {
         customNote.innerHTML = '';
