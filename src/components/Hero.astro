@@ -27,8 +27,8 @@ import { CLOVER, BIZ } from '../site.ts';
 
   <div class="hero__content shell">
     <p class="hero__kicker">{BIZ.tagline}</p>
-    <h1 class="hero__line">Love&nbsp;&amp;&nbsp;Flour Bakery</h1>
-    <p class="hero__sub">Pan dulce, cakes, and breakfast in a welcoming bakery.</p>
+    <h1 class="hero__line">Love&nbsp;and&nbsp;Flour Bakery</h1>
+    <p class="hero__sub">Pan dulce, cakes, and breakfast in a welcoming atmosphere.</p>
     <div class="hero__actions">
       <a class="btn" href={CLOVER} target="_blank" rel="noopener">Order online</a>
       <a class="link-quiet" href="/order-cakes">Order a cake</a>
@@ -113,7 +113,9 @@ import { CLOVER, BIZ } from '../site.ts';
   }
 
   .hero__line {
-    font-size: var(--step-4);
+    /* The name is the headline. The 12.7vw cap keeps "Love and Flour" on one
+       line on the narrowest phones. */
+    font-size: min(12.7vw, clamp(3rem, 2.1rem + 3.9vw, 5.75rem));
     font-weight: 600;
     line-height: 1.02;
     letter-spacing: -0.028em;
