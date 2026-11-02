@@ -6,7 +6,7 @@ import { BIZ } from '../site.ts';
 import transportEn from '../assets/img/transport-en.jpg';
 import transportEs from '../assets/img/transport-es.jpg';
 import {
-  FLAVORS, ROUND_SIZES, HIGH, SHEETS, LEAD_DAYS, fromPrice, money,
+  FLAVORS, ROUND_SIZES, PARTY_SIZES, HIGH, SHEETS, LEAD_DAYS, fromPrice, money,
 } from '../data/cakes.ts';
 
 /* Ideas, not add-ons: Vanessa prices decoration herself once she has seen the
@@ -30,6 +30,7 @@ const IDEAS = [
 const clientData = {
   lead: LEAD_DAYS,
   high: HIGH,
+  party: PARTY_SIZES,
   sheets: SHEETS,
   flavors: FLAVORS.map(({ img, ...f }) => f),
 };
@@ -181,7 +182,7 @@ const clientData = {
                 <label class="chip">
                   <input class="visually-hidden" type="radio" name="Shape" value="Round" data-shape="round" id="shape-round" required />
                   <span class="chip__main">Round</span>
-                  <span class="chip__sub">6" to 12"</span>
+                  <span class="chip__sub">6" to 14"</span>
                 </label>
                 <label class="chip">
                   <input class="visually-hidden" type="radio" name="Shape" value="Sheet (rectangular)" data-shape="sheet" id="shape-sheet" required />
@@ -200,12 +201,12 @@ const clientData = {
             <div class="reveal reveal--round" data-panel="round">
               <fieldset class="group">
                 <legend class="group__legend">Size</legend>
-                <div class="chips chips--4">
+                <div class="chips chips--5">
                   {ROUND_SIZES.map((s) => (
                     <label class="chip">
                       <input class="visually-hidden" type="radio" name="Round size" value={`${s}"`} data-size={s} />
                       <span class="chip__main">{s}&Prime;</span>
-                      <span class="chip__sub" data-est-round={s}>&nbsp;</span>
+                      <span class="chip__sub" data-est-round={s}>{PARTY_SIZES.includes(s) ? 'for big parties' : '\u00a0'}</span>
                     </label>
                   ))}
                 </div>
@@ -674,9 +675,13 @@ const clientData = {
   .chips--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .chips--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .chips--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .chips--5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  @media (max-width: 760px) { .chips--5 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 620px) {
     .chips--3 { grid-template-columns: 1fr; }
     .chips--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .chips--5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .chips--5 .chip:last-child { grid-column: 1 / -1; }
   }
 
   /* position: relative on every chip and idea: the real inputs inside are
@@ -996,11 +1001,12 @@ const clientData = {
     /* ---------- pricing ---------- */
     // Returns a number (estimate), null (not usually available: custom request)
     // or undefined (nothing to price yet).
+    function isParty(size) { return DATA.party.indexOf(size) > -1; }
     function priceFor(flavor, shape, key, height) {
       if (!flavor || !shape || !key) return undefined;
       if (flavor.id === 'other' || shape === 'custom') return null;
       if (shape === 'round') {
-        if (flavor.round[key] == null) return null;
+        if (isParty(key) || flavor.round[key] == null) return null;
         return height === 'double' ? DATA.high[key] : flavor.round[key];
       }
       if (shape === 'sheet') {
@@ -1016,9 +1022,11 @@ const clientData = {
     }
     function comesIn(flavor) {
       var parts = [];
+      // Party sizes aren't in flavor.round, so this lists only the priced sizes.
       var rounds = Object.keys(flavor.round).sort(function (a, b) { return a - b; });
       if (rounds.length) parts.push(listJoin(rounds.map(function (s) { return s + '"'; })) + (rounds.length > 1 ? ' rounds' : ' round'));
       if (flavor.sheet === 'all') parts.push('every sheet size');
+      else if (Object.keys(flavor.sheet).length === DATA.sheets.length) parts.push('every sheet size');
       else if (flavor.sheet) parts.push(listJoin(Object.keys(flavor.sheet).map(function (k) { return sheetById[k].label.toLowerCase() + 's'; })));
       return listJoin(parts);
     }
@@ -1044,11 +1052,13 @@ const clientData = {
       }
       var flavorText = flavor ? (flavor.id === 'other' ? (val('Custom flavor') ? 'Custom: ' + val('Custom flavor') : 'Something else') : flavor.name) : '';
       var price = priceFor(flavor, shape, key, height);
+      var party = shape === 'round' && isParty(key);
       return {
         flavor: flavor, flavorText: flavorText, shape: shape, height: height,
         key: key, sizeText: sizeText, price: price,
         // A real flavor in a size it doesn't usually come in.
-        offMenu: price === null && flavor && flavor.id !== 'other' && shape !== 'custom',
+        offMenu: price === null && flavor && flavor.id !== 'other' && shape !== 'custom' && !party,
+        party: party,
       };
     }
 
@@ -1072,6 +1082,7 @@ const clientData = {
     function syncChips(s) {
       all('[data-est-round]').forEach(function (el) {
         var p = priceFor(s.flavor, 'round', el.dataset.estRound, s.height);
+        if (isParty(el.dataset.estRound)) { el.textContent = 'for big parties'; el.classList.remove('is-custom'); return; }
         el.textContent = p === undefined ? ' ' : p === null ? (s.flavor.id === 'other' ? 'price to confirm' : 'custom request') : 'est. ' + money(p);
         el.classList.toggle('is-custom', p === null);
       });
@@ -1095,7 +1106,13 @@ const clientData = {
       } else if (s.flavor) {
         availability.textContent = "For a flavor that isn't on our list, pick any size. We'll confirm what's possible and the price when we call.";
       }
-      if (s.offMenu && s.key) {
+      if (s.party) {
+        customNote.innerHTML = '';
+        var pn = document.createElement('strong');
+        pn.textContent = s.key + '" cakes are for big parties.';
+        customNote.append(pn, " We'll go over the details and the price when we call.");
+        customNote.hidden = false;
+      } else if (s.offMenu && s.key) {
         customNote.innerHTML = '';
         var t = document.createElement('strong');
         t.textContent = offMenuText(s) + '.';

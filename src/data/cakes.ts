@@ -35,13 +35,17 @@ import chocolateStrawberry from '../assets/img/cakes/chocolate-strawberry.png';
 /** Days of notice a cake needs. PLACEHOLDER: confirm with Vanessa. */
 export const LEAD_DAYS = 5;
 
-export type RoundSize = '6' | '8' | '10' | '12';
+export type RoundSize = '6' | '8' | '10' | '12' | '14';
 export type SheetSize = 'small' | 'medium' | 'large';
 
-export const ROUND_SIZES: RoundSize[] = ['6', '8', '10', '12'];
+export const ROUND_SIZES: RoundSize[] = ['6', '8', '10', '12', '14'];
+
+/** Offered for every flavor but never priced on the site: big parties only, so
+    Vanessa quotes these when she calls. Not treated as a custom request. */
+export const PARTY_SIZES: RoundSize[] = ['14'];
 
 /** Double height ("high") cakes: twice as tall, priced by size only. */
-export const HIGH: Record<RoundSize, number> = { 6: 78.95, 8: 96.95, 10: 145, 12: 185 };
+export const HIGH: Partial<Record<RoundSize, number>> = { 6: 78.95, 8: 96.95, 10: 145, 12: 185 };
 
 /** Rectangular sheet cakes. A full sheet is the bakery's whole baking tray.
     Clover also lists a "mini" sheet ($32.95, serves 4–6). It's left off the site
@@ -60,46 +64,49 @@ export interface Flavor {
   note?: string;
   img: ImageMetadata | null;
   round: Partial<Record<RoundSize, number>>;
-  /** 'all' = every sheet at the standard price; an object = its own prices. */
-  sheet?: 'all' | Partial<Record<SheetSize, number>>;
+  /** 'all' = every sheet at the standard price (Vanessa: sheets start at the
+      same price as vanilla); an object = its own prices. */
+  sheet: 'all' | Partial<Record<SheetSize, number>>;
 }
 
-/* In the order of her price sheet. */
+/* In the order of her price sheet. Her Nov 2026 update: every flavor comes in 12"
+   from $96 (flavors with their own 12" price keep it) and in every sheet size at
+   the standard price (Angel's Kiss keeps its higher half and full sheet prices). */
 export const FLAVORS: Flavor[] = [
   { id: 'tres-leches', name: 'Tres Leches', img: tresLeches,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 }, sheet: 'all' },
   { id: 'strawberry', name: 'Strawberry', img: strawberry,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'neapolitan', name: 'Neapolitan', img: neapolitan,
-    round: { 6: 35.95, 8: 45.95, 10: 52.95, 12: 98.5 } },
+    round: { 6: 35.95, 8: 45.95, 10: 52.95, 12: 98.5 }, sheet: 'all' },
   { id: 'cappuccino', name: 'Cappuccino', img: cappuccino,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'mocha', name: 'Mocha', img: mocha,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 }, sheet: 'all' },
   { id: 'red-velvet', name: 'Red Velvet', img: redVelvet,
-    round: { 6: 30.95, 8: 40.95, 10: 50.95, 12: 96.5 } },
+    round: { 6: 30.95, 8: 40.95, 10: 50.95, 12: 96.5 }, sheet: 'all' },
   { id: 'chocolate-vanilla', name: 'Chocolate-Vanilla', img: chocolateVanilla,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'symphony', name: 'Symphony', note: 'Caramel, red velvet and chocolate', img: symphony,
-    round: { 6: 29.95, 8: 39.95, 10: 49.95 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'triple-chocolate', name: 'Triple Chocolate', img: tripleChocolate,
-    round: { 6: 31.95, 8: 40.95, 10: 54.95 } },
+    round: { 6: 31.95, 8: 40.95, 10: 54.95, 12: 96 }, sheet: 'all' },
   { id: 'caramel', name: 'Caramel Syrup', img: caramel,
-    round: { 6: 29.95, 8: 39.95 } },
+    round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'carrot', name: 'Carrot Cream Cheese', img: carrot,
-    round: { 8: 41.95, 10: 51.95 } },
+    round: { 8: 41.95, 10: 51.95, 12: 96 }, sheet: 'all' },
   { id: 'black-forest', name: 'Black Forest', img: blackForest,
-    round: { 6: 31.95, 8: 41.95, 10: 51.95 } },
+    round: { 6: 31.95, 8: 41.95, 10: 51.95, 12: 96 }, sheet: 'all' },
   { id: 'angels-kiss', name: "Angel's Kiss", note: 'Tres leches with flan', img: angelsKiss,
-    round: { 8: 42.95, 10: 52.95 }, sheet: { medium: 128.95, large: 225 } },
+    round: { 8: 42.95, 10: 52.95, 12: 96 }, sheet: { small: 68.95, medium: 128.95, large: 225 } },
   { id: 'tiramisu', name: 'Tiramisu', note: 'With mascarpone', img: tiramisu,
-    round: { 6: 30.95, 8: 42.5, 10: 55.5 } },
+    round: { 6: 30.95, 8: 42.5, 10: 55.5, 12: 96 }, sheet: 'all' },
   { id: 'mango', name: 'Mango Mousse', img: mango,
-    round: { 8: 42.95, 10: 55.95 } },
+    round: { 8: 42.95, 10: 55.95, 12: 96 }, sheet: 'all' },
   { id: 'oreo', name: 'Oreo', img: oreo,
-    round: { 6: 29.95, 10: 49.95 } },
+    round: { 6: 29.95, 8: 40.95, 10: 49.95, 12: 96 }, sheet: 'all' },
   { id: 'chocolate-strawberry', name: 'Chocolate-Strawberry', note: 'Chocolate cake, strawberry filling',
-    img: chocolateStrawberry, round: { 8: 39.95 } },
+    img: chocolateStrawberry, round: { 6: 30.95, 8: 39.95, 10: 50.95, 12: 96 }, sheet: 'all' },
 
   /* No photo — the simple option, common for office parties. Prices are the
      old Clover "Vanilla" row; it was taken off the new sheet. Confirm. */
