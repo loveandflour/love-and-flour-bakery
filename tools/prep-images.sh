@@ -128,6 +128,7 @@ const jobs = [
     'triple-chocolate':     'triplechocolate.png',
     'caramel':              'caramel.png',
     'carrot':               'Carrot Cake.png',
+    'vanilla':              'vanilla.png',
     'black-forest':         'Black Forest.png',
     'angels-kiss':          'angel cake.png',
     'tiramisu':             'tiramisu.png',

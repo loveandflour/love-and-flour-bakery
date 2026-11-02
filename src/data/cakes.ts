@@ -31,6 +31,7 @@ import tiramisu from '../assets/img/cakes/tiramisu.png';
 import mango from '../assets/img/cakes/mango.png';
 import oreo from '../assets/img/cakes/oreo.png';
 import chocolateStrawberry from '../assets/img/cakes/chocolate-strawberry.png';
+import vanilla from '../assets/img/cakes/vanilla.png';
 
 /** Days of notice a cake needs. PLACEHOLDER: confirm with Vanessa. */
 export const LEAD_DAYS = 5;
@@ -108,10 +109,10 @@ export const FLAVORS: Flavor[] = [
   { id: 'chocolate-strawberry', name: 'Chocolate-Strawberry', note: 'Chocolate cake, strawberry filling',
     img: chocolateStrawberry, round: { 6: 30.95, 8: 39.95, 10: 50.95, 12: 96 }, sheet: 'all' },
 
-  /* No photo — the simple option, common for office parties. Prices are the
-     old Clover "Vanilla" row; it was taken off the new sheet. Confirm. */
+  /* The simple option, common for office parties. Prices are the old Clover
+     "Vanilla" row; it was taken off the new sheet. Confirm. */
   { id: 'vanilla', name: 'Plain vanilla', note: 'Simple and classic. Good for offices and parties.',
-    img: null, round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 }, sheet: 'all' },
+    img: vanilla, round: { 6: 29.95, 8: 39.95, 10: 49.95, 12: 96.5 }, sheet: 'all' },
 ];
 
 /** The four cakes on the home page, in order. */
