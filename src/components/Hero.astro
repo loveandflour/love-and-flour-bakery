@@ -27,9 +27,8 @@ import { CLOVER, BIZ } from '../site.ts';
 
   <div class="hero__content shell">
     <p class="hero__kicker">{BIZ.tagline}</p>
-    <h1 class="hero__line">
-      Pan dulce, cakes, and breakfast. Made from scratch starting at 5&nbsp;a.m.
-    </h1>
+    <h1 class="hero__line">Love&nbsp;&amp;&nbsp;Flour Bakery</h1>
+    <p class="hero__sub">Pan dulce, cakes, and breakfast in a welcoming bakery.</p>
     <div class="hero__actions">
       <a class="btn" href={CLOVER} target="_blank" rel="noopener">Order online</a>
       <a class="link-quiet" href="/order-cakes">Order a cake</a>
@@ -121,6 +120,14 @@ import { CLOVER, BIZ } from '../site.ts';
     max-width: 19ch;
     margin: 0;
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  .hero__sub {
+    font-size: var(--step-1);
+    line-height: 1.35;
+    max-width: 34ch;
+    margin: clamp(0.8rem, 2vh, 1.15rem) 0 0;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, 0.4);
   }
 
   .hero__actions {
