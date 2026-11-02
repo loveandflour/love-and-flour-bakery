@@ -78,24 +78,24 @@ export const MENU: Section[] = [
           { name: 'Chilaquiles Divorciados', price: 14.99,
             desc: 'Beef and eggs with red and green chilaquiles.' },
           { name: 'Baleadas Especiales de la Casa',
-            desc: 'With beans, cream and cheese.',
+            desc: 'With beans, crema and cheese.',
             options: [
               { label: 'Chicken or chorizo', price: 12.95 },
               { label: 'Beef', price: 14.5 },
             ] },
           { name: 'Desayuno Ranchero Chapín', price: 14.49,
-            desc: 'Huevos rancheros, beans, plantains and cream.' },
+            desc: 'Huevos rancheros, beans, plantains and crema.' },
         ],
       },
       {
         title: 'Traditional breakfasts',
         items: [
           { name: 'Desayuno Clásico', price: 12.99,
-            desc: 'Sausage in tomato sauce, beans, scrambled eggs, cream and cheese, with 2 tortillas.' },
+            desc: 'Sausage in tomato sauce, beans, scrambled eggs, crema and cheese, with 2 tortillas.' },
           { name: 'Desayuno con Carne Asada', price: 18.99,
-            desc: 'Grilled steak, beans, scrambled eggs, cream and cheese, with 2 tortillas.' },
+            desc: 'Grilled steak, beans, scrambled eggs, crema and cheese, with 2 tortillas.' },
           { name: 'Desayuno con Chorizo', price: 14.49,
-            desc: 'Chorizo, beans, scrambled eggs, cream and cheese, with 2 tortillas.' },
+            desc: 'Chorizo, beans, scrambled eggs, crema and cheese, with 2 tortillas.' },
         ],
       },
       {
@@ -113,7 +113,7 @@ export const MENU: Section[] = [
         title: 'Add to your breakfast',
         items: [
           { name: 'Coffee', price: 2.75 },
-          { name: 'Licuado (34 oz)', price: 6.95 },
+          { name: 'Smoothie (34 oz)', price: 6.95 },
           { name: 'Extra meat', price: 8.5 },
           { name: 'Make it a combo', price: 2.49, add: true,
             desc: 'Add coffee or juice to any breakfast.' },
@@ -125,8 +125,8 @@ export const MENU: Section[] = [
   /* ----------------------------------------------------------------- */
   {
     id: 'kitchen',
-    nav: 'Kitchen',
-    title: 'From the kitchen',
+    nav: 'Hot Entrees',
+    title: 'Hot and made to order',
     es: 'Platos principales',
     groups: [
       {
@@ -158,10 +158,10 @@ export const MENU: Section[] = [
         ],
       },
       {
-        title: 'Plates',
+        title: 'Entrees',
         items: [
           { name: 'Hamburguesa de la Casa', price: 15.5,
-            desc: 'Lettuce, tomato, onion and house dressing, with fries.' },
+            desc: 'Hamburger on a bun, served with lettuce, tomato, onion and house dressing, with fries.' },
           { name: 'Pechuga Asada', price: 16.5,
             desc: 'Grilled chicken breast with fries, salad, beans, 2 tortillas, hot sauce and curtido.' },
           { name: 'Carne Asada', price: 20.95,
@@ -173,9 +173,9 @@ export const MENU: Section[] = [
         ],
       },
       {
-        title: 'Antojitos',
+        title: 'Snacks',
         items: [
-          { name: 'Plátanos con Crema', price: 5.5, desc: 'Plantains with cream.' },
+          { name: 'Plátanos con Crema', price: 5.5, desc: 'Plantains with crema.' },
           { name: 'Papas Locas', price: 7.25 },
           { name: 'Yuca con Chicharrón', price: 8.25 },
           { name: 'Panqueques', price: 8.5, desc: 'Pancakes on their own.' },
@@ -248,8 +248,8 @@ export const MENU: Section[] = [
           { name: 'Caramel Macchiato', prices: [5.75, 6.75], desc: 'Steamed milk with a shot of espresso and house caramel.' },
           { name: 'Vanilla Latte', prices: [5.75, 6.95], desc: 'Espresso with creamy milk and Madagascar vanilla.' },
           { name: 'Hazelnut Latte', prices: [5.75, 6.75], desc: 'Espresso with creamy milk and hazelnut.' },
-          { name: 'Cold Brew con Crema', prices: [5.95, 6.95], desc: 'Slow-steeped cold brew with sweet cream and a touch of vanilla.' },
-          { name: 'Cookies & Cream Frappé', prices: [6.25, 7.25], desc: 'Blended coffee with Oreo, cream and a touch of chocolate.' },
+          { name: 'Cold Brew con Crema', prices: [5.95, 6.95], desc: 'Slow-steeped cold brew with sweet crema and a touch of vanilla.' },
+          { name: 'Cookies & Cream Frappé', prices: [6.25, 7.25], desc: 'Blended coffee with Oreo, crema and a touch of chocolate.' },
           { name: 'White Chocolate Frappé', prices: [6.25, 7.25], desc: 'Blended coffee, white chocolate and milk.' },
         ],
       },
@@ -270,15 +270,15 @@ export const MENU: Section[] = [
 
   /* ----------------------------------------------------------------- */
   {
-    id: 'licuados',
-    nav: 'Licuados',
-    title: 'Licuados & juice',
-    es: 'Licuados naturales',
+    id: 'smoothies',
+    nav: 'Smoothies',
+    title: 'Smoothies & juice',
+    es: 'Smoothies naturales',
     groups: [
       {
         title: 'Fresh',
         items: [
-          { name: 'Licuado Natural (34 oz)', price: 6.95,
+          { name: 'Smoothie Natural (34 oz)', price: 6.95,
             desc: 'Strawberry, mango, banana, strawberry-banana or papaya.' },
           { name: 'Jugo de Naranja Natural (16 oz)', price: 8.5,
             desc: 'Fresh-squeezed orange juice.' },

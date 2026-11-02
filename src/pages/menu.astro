@@ -17,7 +17,7 @@ const priceText = (item: Item, n: number) =>
 <Base
   title="Menu — Love & Flour Bakery"
   navOver
-  description="The Love & Flour menu: breakfast made to order, tacos, tortas and plates from the kitchen, coffee and specialty drinks, licuados and granizadas. Silver Spring, MD."
+  description="The Love & Flour menu: breakfast made to order, tacos, tortas and plates from the kitchen, coffee and specialty drinks, smoothies and granizadas. Silver Spring, MD."
 >
   <!-- ===================== header ===================== -->
   <section class="section page-head" data-nav-over>
@@ -79,7 +79,7 @@ const priceText = (item: Item, n: number) =>
               <figure class="msec__plate">
                 <Image
                   src={plate}
-                  alt="A breakfast plate: scrambled eggs, black beans in a stone molcajete with tortillas, fried plantains, cream and fresh cheese"
+                  alt="A breakfast plate: scrambled eggs, black beans in a stone molcajete with tortillas, fried plantains, crema and fresh cheese"
                   widths={[600, 900, 1300, 1800]}
                   sizes="(max-width: 760px) 90vw, 820px"
                   loading="eager"
@@ -87,12 +87,12 @@ const priceText = (item: Item, n: number) =>
               </figure>
             )}
 
-            <div class={`msec__body ${section.id === 'licuados' ? 'msec__body--photo' : ''}`}>
-              {section.id === 'licuados' && (
+            <div class={`msec__body ${section.id === 'smoothies' ? 'msec__body--photo' : ''}`}>
+              {section.id === 'smoothies' && (
                 <figure class="msec__side">
                   <Image
                     src={licuado}
-                    alt="A strawberry licuado topped with a sugar cookie, wearing the Love & Flour sticker, on a table outside the shop"
+                    alt="A strawberry smoothie topped with a sugar cookie, wearing the Love & Flour sticker, on a table outside the shop"
                     widths={[480, 800, 1200]}
                     sizes="(max-width: 760px) 100vw, 420px"
                     loading="lazy"
@@ -278,7 +278,7 @@ const priceText = (item: Item, n: number) =>
     scroll-margin-top: calc(var(--nav-h) + 3.5rem);
   }
   .msec + .msec { border-top: 1px solid var(--hairline); }
-  .msec--licuados { background: var(--blush-wash); }
+  .msec--smoothies { background: var(--blush-wash); }
 
   .msec__head { max-width: 58ch; margin-bottom: clamp(1.75rem, 4vw, 2.5rem); }
   .msec__es { color: var(--ink-faint); margin-bottom: 0.4rem; }
