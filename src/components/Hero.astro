@@ -168,5 +168,21 @@ import { CLOVER, BIZ } from '../site.ts';
     v.load();
     var p = v.play();
     if (p && p.catch) p.catch(function () { /* autoplay refused — poster stands */ });
+
+    // iOS pauses the video when Safari goes to the background and doesn't
+    // restart it, which left the hero frozen on a half-decoded, smeared frame.
+    // Resume on return; if the decoder was released, reload and play.
+    function resume() {
+      if (document.visibilityState !== 'visible' || !v.paused) return;
+      var r = v.readyState < 2 ? (v.load(), v.play()) : v.play();
+      if (r && r.catch) r.catch(function () {
+        v.load();
+        var again = v.play();
+        if (again && again.catch) again.catch(function () {});
+      });
+    }
+    document.addEventListener('visibilitychange', resume);
+    window.addEventListener('pageshow', function (e) { if (e.persisted) resume(); });
+    window.addEventListener('focus', resume);
   })();
 </script>

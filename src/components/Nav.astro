@@ -21,6 +21,14 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
 
 <a class="skip" href="#main">Skip to content</a>
 
+<!-- iOS Safari (26+) ignores theme-color and paints its status bar and floating
+     toolbar with the colour of a fixed element touching the screen edge, or else
+     the page background (cream). While the nav sits over a dark hero these two
+     strips make Safari paint those bars dark too, instead of leaving cream bars
+     above and below the footage. iOS only, and only over a hero; see the CSS. -->
+<div class="tint tint--top" aria-hidden="true"></div>
+<div class="tint tint--bottom" aria-hidden="true"></div>
+
 <header class="nav" id="siteNav" data-state={initialState}>
   <div class="nav__inner">
     <a class="nav__brand" href="/" aria-label="Love &amp; Flour Bakery — home">
@@ -79,9 +87,22 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
     color: var(--ink);
   }
 
+  .tint { display: none; }
+  @supports (-webkit-touch-callout: none) {
+    .tint {
+      position: fixed; left: 0; right: 0; z-index: 99;
+      height: 2px; background: var(--espresso); pointer-events: none;
+    }
+    .tint--top { top: 0; }
+    .tint--bottom { bottom: 0; }
+    body:has(.nav[data-state='over-hero']) .tint { display: block; }
+  }
+
   .nav__inner {
     max-width: var(--shell); margin-inline: auto;
     padding: clamp(0.7rem, 1.6vw, 1.1rem) var(--gutter);
+    /* Under the status bar now that the page draws there (viewport-fit=cover). */
+    padding-top: calc(clamp(0.7rem, 1.6vw, 1.1rem) + env(safe-area-inset-top, 0px));
     display: flex; align-items: center; justify-content: space-between;
     gap: 2rem;
   }
