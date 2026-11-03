@@ -199,6 +199,18 @@ const priceText = (item: Item, n: number) =>
       linear-gradient(to right, rgba(36, 22, 17, 0.32) 0%, rgba(36, 22, 17, 0.12) 55%, transparent 80%),
       rgba(36, 22, 17, 0.5);
   }
+  /* iOS: fade the top into the solid espresso Safari paints behind the status
+     bar on this page, instead of a hard line (see Hero.astro). */
+  @supports (-webkit-touch-callout: none) {
+    .page-head__bg::after {
+      background:
+        linear-gradient(to bottom,
+          rgb(36 22 17) env(safe-area-inset-top, 0px),
+          rgb(36 22 17 / 0) calc(env(safe-area-inset-top, 0px) + 110px)),
+        linear-gradient(to right, rgba(36, 22, 17, 0.32) 0%, rgba(36, 22, 17, 0.12) 55%, transparent 80%),
+        rgba(36, 22, 17, 0.5);
+    }
+  }
 
   .page-head .eyebrow { color: var(--blush); margin-bottom: 0.45rem; }
   .page-head__h {

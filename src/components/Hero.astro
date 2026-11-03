@@ -93,6 +93,27 @@ import { CLOVER, BIZ } from '../site.ts';
         transparent 18%),
       rgba(0, 0, 0, var(--hero-dim));
   }
+  /* iOS Safari paints its status bar and toolbar solid espresso over this page
+     (see the tint notes in Nav.astro). Fade the footage into that colour at
+     both edges so the bars melt into the video instead of ending in a line.
+     The top fade starts below the status bar when the page draws under it
+     (safe-area inset); the bottom one starts above the floating toolbar. */
+  @supports (-webkit-touch-callout: none) {
+    .hero__scrim {
+      background:
+        linear-gradient(to bottom,
+          rgb(36 22 17) env(safe-area-inset-top, 0px),
+          rgb(36 22 17 / 0) calc(env(safe-area-inset-top, 0px) + 110px)),
+        linear-gradient(to top,
+          rgb(36 22 17) calc(100lvh - 100svh),
+          rgb(36 22 17 / 0) calc(100lvh - 100svh + 130px)),
+        linear-gradient(to top,
+          rgba(0, 0, 0, 0.34) 0%,
+          rgba(0, 0, 0, 0.16) 28%,
+          transparent 58%),
+        rgba(0, 0, 0, var(--hero-dim));
+    }
+  }
 
   .hero__content {
     position: relative;
