@@ -78,9 +78,10 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
   }
   /* Overlaid directly on the hero — no bar — while the dark footage carries it. */
   .nav[data-state='over-hero'] { background: transparent; color: #fff; }
+  /* A plain, solid colour: iOS Safari reads that most reliably for the
+     status-bar strip above the nav (a translucent blend can leave it stale). */
   .nav[data-state='scrolled'] {
-    background: color-mix(in srgb, var(--ground) 94%, transparent);
-    backdrop-filter: blur(10px);
+    background: var(--ground);
     box-shadow: 0 1px 0 var(--hairline);
     color: var(--ink);
   }
