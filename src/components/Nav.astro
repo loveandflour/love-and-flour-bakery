@@ -21,13 +21,11 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
 
 <a class="skip" href="#main">Skip to content</a>
 
-<!-- iOS Safari (26+) ignores theme-color and paints its status bar and floating
-     toolbar with the colour of a fixed element touching the screen edge, or else
-     the page background (cream). While the nav sits over a dark hero these two
-     strips make Safari paint those bars dark too, instead of leaving cream bars
-     above and below the footage. iOS only, and only over a hero; see the CSS. -->
-<div class="tint tint--top" aria-hidden="true"></div>
-<div class="tint tint--bottom" aria-hidden="true"></div>
+<!-- iOS Safari (26+) ignores theme-color. At the bottom it paints its floating
+     toolbar with the colour of a fixed element touching the bottom edge, or else
+     the page background (cream). While a dark hero fills the screen, this strip
+     makes that area dark instead of a cream bar. iOS only; see the CSS. -->
+<div class="tint" aria-hidden="true"></div>
 
 <header class="nav" id="siteNav" data-state={initialState}>
   <div class="nav__inner">
@@ -87,16 +85,25 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
     color: var(--ink);
   }
 
+  /* Safari only samples a fixed edge element that is over 10px deep and can be
+     hit-tested (so no pointer-events: none). Shown only at the very top of a
+     hero page, while the hero still covers the whole screen. */
   .tint { display: none; }
   @supports (-webkit-touch-callout: none) {
     .tint {
-      position: fixed; left: 0; right: 0; z-index: 99;
-      height: 2px; background: var(--espresso); pointer-events: none;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 99;
+      height: max(12px, env(safe-area-inset-bottom, 0px));
+      background: var(--espresso);
     }
-    .tint--top { top: 0; }
-    .tint--bottom { bottom: 0; }
-    body:has(.nav[data-state='over-hero']) .tint { display: block; }
+    :global(html.at-top) body:has(.nav[data-state='over-hero']) .tint { display: block; }
   }
+
+  /* Over a hero the nav lets taps fall through everywhere but its own links and
+     buttons. Safari then shows the page itself (the hero) behind the status bar
+     instead of painting a flat bar: it skips a see-through fixed header that
+     can't be hit-tested. */
+  .nav[data-state='over-hero']:not([data-open]) { pointer-events: none; }
+  .nav[data-state='over-hero']:not([data-open]) :is(a, button) { pointer-events: auto; }
 
   .nav__inner {
     max-width: var(--shell); margin-inline: auto;
@@ -185,6 +192,12 @@ const isCurrent = (href: string) => !href.startsWith('http') && href.replace(/\/
     var toggle = document.getElementById('navToggle');
     var panel = document.getElementById('navPanel');
     if (!nav || !toggle || !panel) return;
+
+    // For the iOS bottom tint (CSS): true only at the very top of the page.
+    var root = document.documentElement;
+    function atTop() { root.classList.toggle('at-top', window.scrollY < 8); }
+    atTop();
+    window.addEventListener('scroll', atTop, { passive: true });
 
     toggle.addEventListener('click', function () {
       var open = nav.hasAttribute('data-open');

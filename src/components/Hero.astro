@@ -158,7 +158,14 @@ import { CLOVER, BIZ } from '../site.ts';
              : small ? '/video/hero-720'
              : '/video/hero-1080';
 
-    [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (f) {
+    // Apple devices get the H.264 mp4 first: Safari decodes it in hardware, and
+    // its VP9 webm playback is what smeared when coming back from the background.
+    var apple = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+      (/Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|Edg|Firefox/.test(navigator.userAgent));
+    var formats = [['webm', 'video/webm'], ['mp4', 'video/mp4']];
+    if (apple) formats.reverse();
+    formats.forEach(function (f) {
       var s = document.createElement('source');
       s.src = base + '.' + f[0];
       s.type = f[1];
@@ -169,20 +176,27 @@ import { CLOVER, BIZ } from '../site.ts';
     var p = v.play();
     if (p && p.catch) p.catch(function () { /* autoplay refused — poster stands */ });
 
-    // iOS pauses the video when Safari goes to the background and doesn't
-    // restart it, which left the hero frozen on a half-decoded, smeared frame.
-    // Resume on return; if the decoder was released, reload and play.
-    function resume() {
-      if (document.visibilityState !== 'visible' || !v.paused) return;
-      var r = v.readyState < 2 ? (v.load(), v.play()) : v.play();
-      if (r && r.catch) r.catch(function () {
-        v.load();
-        var again = v.play();
-        if (again && again.catch) again.catch(function () {});
+    // iOS suspends the video when Safari goes to the background and can hand it
+    // back frozen on a smeared, half-decoded frame, sometimes while still
+    // reporting itself as playing. So after any trip to the background, reload
+    // the clip and carry on from where it was rather than trusting its state.
+    var away = false, at = 0;
+    function leave() { away = true; at = v.currentTime || 0; }
+    function back() {
+      if (!away || document.visibilityState !== 'visible') return;
+      away = false;
+      v.addEventListener('loadedmetadata', function seek() {
+        v.removeEventListener('loadedmetadata', seek);
+        try { if (at && v.duration) v.currentTime = at % v.duration; } catch (e) {}
       });
+      v.load();
+      var r = v.play();
+      if (r && r.catch) r.catch(function () {});
     }
-    document.addEventListener('visibilitychange', resume);
-    window.addEventListener('pageshow', function (e) { if (e.persisted) resume(); });
-    window.addEventListener('focus', resume);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'hidden') leave(); else back();
+    });
+    window.addEventListener('pagehide', leave);
+    window.addEventListener('pageshow', function (e) { if (e.persisted) { away = true; back(); } });
   })();
 </script>
