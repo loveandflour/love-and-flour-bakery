@@ -60,6 +60,14 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--ground); }
+
+/* Pages that open on a dark header (home, menu). At the very top of the page
+   iOS Safari doesn't draw content under the status bar; it fills that strip
+   with the body's background colour. Dark there, so it runs on from the
+   footage instead of a cream bar. The page itself keeps its cream ground:
+   main carries it instead of body, and the footer has its own. */
+body.dark-top { background: var(--espresso); }
+body.dark-top main { background: var(--ground); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {

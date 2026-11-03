@@ -111,7 +111,7 @@ const schema = {
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
 
-  <body>
+  <body class={hasHero || navOver ? 'dark-top' : undefined}>
     <Nav hasHero={hasHero || navOver} />
     <main id="main" class={hasHero || navOver ? '' : 'main--offset'}><slot /></main>
     <Footer />
