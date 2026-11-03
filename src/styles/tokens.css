@@ -70,10 +70,6 @@ body.dark-top { background: var(--espresso); }
 body.dark-top main { background: var(--ground); }
 /* The iOS runway (Base.astro): a margin, so it shows the dark body behind it. */
 html.ios-runway body.dark-top main { margin-top: 64px; }
-/* Tell iOS these dark-headed pages are dark, so its glass fade behind the
-   status bar and toolbar is the dark version rather than a light fog. Every
-   colour on the page is explicit, so nothing visible on the page changes. */
-html.ios-runway { color-scheme: dark; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
