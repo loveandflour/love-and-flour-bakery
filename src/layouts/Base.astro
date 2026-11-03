@@ -115,6 +115,29 @@ const schema = {
     <Nav hasHero={hasHero || navOver} />
     <main id="main" class={hasHero || navOver ? '' : 'main--offset'}><slot /></main>
     <Footer />
+
+    {(hasHero || navOver) && (
+      /* iOS Safari only draws the page behind its status bar and toolbar once
+         the page is scrolled at all; at exactly the top it paints flat bars. So
+         on iPhones these pages get a 64px dark runway above the content and open
+         scrolled just past it: the dark header still starts at the top of the
+         screen, and Safari draws it behind the clock and the toolbar. Scrolling
+         back up reveals the runway in the same dark as those bars. */
+      <script is:inline>
+        (function () {
+          if (!window.CSS || !CSS.supports('-webkit-touch-callout', 'none')) return;
+          var OFFSET = 64; // keep in step with html.ios-runway in tokens.css
+          document.documentElement.classList.add('ios-runway');
+          function nudge() {
+            if (location.hash || window.scrollY >= OFFSET) return;
+            window.scrollTo({ top: OFFSET, left: 0, behavior: 'instant' });
+          }
+          nudge();
+          if (document.readyState !== 'complete') window.addEventListener('load', nudge);
+          setTimeout(nudge, 300);
+        })();
+      </script>
+    )}
   </body>
 </html>
 
