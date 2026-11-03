@@ -68,8 +68,6 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(
    main carries it instead of body, and the footer has its own. */
 body.dark-top { background: var(--espresso); }
 body.dark-top main { background: var(--ground); }
-/* The iOS runway (Base.astro): a margin, so it shows the dark body behind it. */
-html.ios-runway body.dark-top main { margin-top: 64px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
