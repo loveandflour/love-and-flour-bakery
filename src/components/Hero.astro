@@ -179,13 +179,12 @@ import { CLOVER, BIZ } from '../site.ts';
              : small ? '/video/hero-720'
              : '/video/hero-1080';
 
-    // Apple devices get the H.264 mp4 first: Safari decodes it in hardware, and
-    // its VP9 webm playback is what smeared when coming back from the background.
-    var apple = /iP(hone|ad|od)/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-      (/Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|Edg|Firefox/.test(navigator.userAgent));
+    // iPhones and iPads get the H.264 mp4 first: iOS decodes it in hardware, and
+    // its VP9 webm playback is what smeared when coming back from the
+    // background. Everything else, desktop Safari included, keeps the webm.
+    var iosDevice = !!(window.CSS && CSS.supports('-webkit-touch-callout', 'none'));
     var formats = [['webm', 'video/webm'], ['mp4', 'video/mp4']];
-    if (apple) formats.reverse();
+    if (iosDevice) formats.reverse();
     formats.forEach(function (f) {
       var s = document.createElement('source');
       s.src = base + '.' + f[0];
