@@ -203,9 +203,16 @@ import { CLOVER, BIZ } from '../site.ts';
     // the clip and carry on from where it was rather than trusting its state.
     var away = false, at = 0;
     function leave() { away = true; at = v.currentTime || 0; }
+    // Only iOS needs the reload: elsewhere it isn't needed, and in desktop
+    // Chrome reloading and seeking froze the webm on the seek frame.
+    var ios = !!(window.CSS && CSS.supports('-webkit-touch-callout', 'none'));
     function back() {
       if (!away || document.visibilityState !== 'visible') return;
       away = false;
+      if (!ios) {
+        if (v.paused) { var q = v.play(); if (q && q.catch) q.catch(function () {}); }
+        return;
+      }
       v.addEventListener('loadedmetadata', function seek() {
         v.removeEventListener('loadedmetadata', seek);
         try { if (at && v.duration) v.currentTime = at % v.duration; } catch (e) {}
