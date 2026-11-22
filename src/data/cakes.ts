@@ -33,8 +33,8 @@ import oreo from '../assets/img/cakes/oreo.png';
 import chocolateStrawberry from '../assets/img/cakes/chocolate-strawberry.png';
 import vanilla from '../assets/img/cakes/vanilla.png';
 
-/** Days of notice a cake needs. PLACEHOLDER: confirm with Vanessa. */
-export const LEAD_DAYS = 5;
+/** Days of notice a cake needs. Vanessa confirmed 3 days (Nov 2026). */
+export const LEAD_DAYS = 3;
 
 export type RoundSize = '6' | '8' | '10' | '12' | '14';
 export type SheetSize = 'small' | 'medium' | 'large';
