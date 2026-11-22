@@ -38,7 +38,7 @@ const clientData = {
 
 <Base
   title="Order a Cake — Love & Flour Bakery"
-  description="Order a cake from Love & Flour Bakery in Silver Spring, MD. Choose a flavor and a size, then tell us how you'd like it decorated, and we'll call to confirm."
+  description="Order a cake from Love & Flour Bakery in Silver Spring, MD. Choose a flavor and a size, then tell us how you'd like it decorated, and Vanessa will call to confirm."
 >
   <!-- ===================== header ===================== -->
   <section class="section page-head">
@@ -48,7 +48,7 @@ const clientData = {
         <h1 class="page-head__h">Order a cake</h1>
         <p class="lede">
           Pick a flavor and a size, then tell us how you'd like it decorated.
-          We'll call you to go over the details.
+          Vanessa, our owner, will call you to go over the details.
         </p>
       </div>
     </div>
@@ -61,7 +61,7 @@ const clientData = {
         <strong>Please order at least {LEAD_DAYS}&nbsp;days before desired pickup date.</strong>
       </p>
       <p class="terms__text">
-        This is a request form. All prices are estimates. After you submit this request, we will call and confirm
+        This is a request form. All prices are estimates. After you submit this request, Vanessa will call to confirm
         the details and the final price for purchase.
       </p>
     </div>
@@ -325,7 +325,7 @@ const clientData = {
             </div>
 
             <p class="hint hint--price">
-              Decorations can change the price. We'll go over it when we call.
+              Decorations can change the price. Vanessa will go over it when she calls.
             </p>
           </section>
 
@@ -400,7 +400,7 @@ const clientData = {
             <h2 class="recap__h" id="h-recap">Your request</h2>
             <dl class="recap__list" id="recapList" hidden></dl>
             <p class="recap__terms">
-              Nothing is charged online. We'll call you to confirm the details and the final
+              Nothing is charged online. Vanessa will call you to confirm the details and the final
               price, and you pay once it's confirmed.
             </p>
             <button class="btn recap__submit" type="submit">Send cake request</button>
@@ -418,7 +418,7 @@ const clientData = {
           <FlourishRule width={200} />
           <h2 class="sent__h">We've got your request.</h2>
           <p>
-            We'll call you<span id="sentPhone"></span> to go over the details and confirm the
+            Vanessa will call you<span id="sentPhone"></span> to go over the details and confirm the
             price. Nothing has been charged.
           </p>
           <p>
@@ -439,7 +439,7 @@ const clientData = {
           <div><dt>Estimate</dt><dd data-sum="est">—</dd></div>
         </dl>
         <a class="link-quiet summary__next" data-next href="#step-flavor">Choose a flavor</a>
-        <p class="summary__terms">Estimate only. We confirm the final price by phone.</p>
+        <p class="summary__terms">Estimate only. Vanessa confirms the final price by phone.</p>
       </aside>
     </div>
   </section>
@@ -1103,19 +1103,19 @@ const clientData = {
         b.textContent = s.flavor.name;
         availability.append(b, ' usually comes in ' + comesIn(s.flavor) + '. Double height is available in round sizes.');
       } else if (s.flavor) {
-        availability.textContent = "For a flavor that isn't on our list, choose any size. We'll confirm what's possible and tell you the price when we call.";
+        availability.textContent = "For a flavor that isn't on our list, choose any size. Vanessa will confirm what's possible and tell you the price when she calls.";
       }
       if (s.party) {
         customNote.innerHTML = '';
         var pn = document.createElement('strong');
         pn.textContent = s.key + '" cakes are for big parties.';
-        customNote.append(pn, " We'll go over the details and the price when we call.");
+        customNote.append(pn, " Vanessa will go over the details and the price when she calls.");
         customNote.hidden = false;
       } else if (s.offMenu && s.key) {
         customNote.innerHTML = '';
         var t = document.createElement('strong');
         t.textContent = offMenuText(s) + '.';
-        customNote.append(t, " You can still ask for it. We'll treat it as a custom request and confirm the price when we call.");
+        customNote.append(t, " You can still ask for it. We'll treat it as a custom request, and Vanessa will confirm the price when she calls.");
         customNote.hidden = false;
       } else {
         customNote.hidden = true;
